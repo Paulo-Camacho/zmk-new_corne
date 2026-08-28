@@ -12,7 +12,7 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 | 0 | **BASE** | Default | QWERTY typing + combos |
 | 1 | **NUMBER** | Hold left inner thumb (`mo 1`) | Numbers, arrows, Bluetooth, RGB |
 | 2 | **SYMBOL** | Hold right inner thumb (`mo 2`) | Code symbols `[]{}()` etc. |
-| 3 | **Fn** | Hold Space or Enter (`lt 3`) | F-keys, reset, Studio unlock |
+| 3 | **Fn** | Hold Enter (`lt 3`) | F-keys, reset, Studio unlock |
 
 ---
 
@@ -23,18 +23,15 @@ LEFT HAND                              JOYSTICK                 RIGHT HAND
 ┌────┬────┬────┬────┬────┬────┐       ┌───┐       ┌────┬────┬────┬────┬────┬────┐
 │Tab │ Q  │ W  │ E  │ R  │ T  │       │ ▲ │       │ Y  │ U  │ I  │ O  │ P  │Bsp │
 ├────┼────┼────┼────┼────┼────┤       │◄─┼─►│       ├────┼────┼────┼────┼────┼────┤
-│Sh/C│ A  │ S  │ D  │ F  │ G  │       │ ▼ │       │ H  │ J  │ K  │ L  │ ;  │ '  │
-│aps*│    │    │    │    │    │       │Ent│       │    │    │    │    │    │    │
-├────┼────┼────┼────┼────┼────┤       └───┘       ├────┼────┼────┼────┼────┼────┤
-│Ctrl│ Z  │ X  │ C  │ V  │ B  │                   │ N  │ M  │ ,  │ .  │ /  │ `  │
-│    │    │    │    │    │Spc │                   │    │    │    │    │    │    │
+│Cmd │ A  │ S  │ D  │ F  │ G  │       │Spc│       │ H  │ J  │ K  │ L  │ ;  │ '  │
+├────┼────┼────┼────┼────┼────┤       │ ▼ │       ├────┼────┼────┼────┼────┼────┤
+│Shft│ Z  │ X  │ C  │ V  │ B  │       └───┘       │ N  │ M  │ ,  │ .  │ /  │ `  │
+│    │    │    │    │    │Ret │                   │    │    │    │    │    │    │
 └────┴────┴────┴────┴────┴────┘                   └────┴────┴────┴────┴────┴────┘
-     ┌────┐ ┌────┐ ┌──────────┐              ┌──────────┐ ┌────┐ ┌────┐
-     │Gui │ │Num │ │Space / Fn│              │Enter / Fn│ │Sym │ │Alt │
-     └────┘ └────┘ └──────────┘              └──────────┘ └────┘ └────┘
+     ┌────┐ ┌────┐ ┌────┐              ┌──────────┐ ┌────┐ ┌────┐
+     │Ctrl│ │Opt │ │Num │              │Enter / Fn│ │Sym │ │Alt │
+     └────┘ └────┘ └────┘              └──────────┘ └────┘ └────┘
 ```
-
-`*` Tap-dance: tap = Shift, double-tap = Caps Lock
 
 ### Joystick (BASE layer)
 
@@ -44,7 +41,7 @@ LEFT HAND                              JOYSTICK                 RIGHT HAND
 | ▼ | Down arrow |
 | ◄ | Left arrow |
 | ► | Right arrow |
-| Press | Enter |
+| Press | **Space** |
 
 ### Encoder (left half)
 
@@ -141,13 +138,13 @@ Combos work on **BASE layer only** unless noted.
 
 ## Tap-dances & holds
 
-| Key | Tap | Hold / Double-tap |
-|-----|-----|-------------------|
-| Left pinky (`td0`) | Shift | Caps Lock (double-tap) |
-| Left inner thumb | — | NUMBER layer |
-| Right inner thumb | — | SYMBOL layer |
-| Space (left) | Space | Fn layer |
-| Enter (right) | Enter | Fn layer |
+| Key | Tap | Hold |
+|-----|-----|------|
+| Left pinky (`A` row) | Command (⌘) | — |
+| Bottom-left (`Z` row) | Shift | — |
+| Left thumbs | Ctrl · Option · NUMBER layer | Hold for layer |
+| Right inner thumb | Enter | Fn layer |
+| Right middle thumb | — | SYMBOL layer |
 
 ---
 
