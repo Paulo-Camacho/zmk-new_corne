@@ -12,7 +12,7 @@ init_vendor_git_repo() {
   rm -rf "${dir}/.git"
   git -C "$dir" init -q
   git -C "$dir" add -A
-  git -C "$dir" commit -qm "vendored snapshot"
+  git -C "$dir" -c user.email="build@localhost" -c user.name="ZMK Build" commit -qm "vendored snapshot"
   git -C "$dir" branch -M "$branch"
 }
 
