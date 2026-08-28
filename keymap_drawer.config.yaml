@@ -522,6 +522,25 @@ parse_config:
       hold: zoom
 
   zmk_combos:
+    jk_esc:
+      align: bottom
+      offset: 0.05
+    df_tab:
+      align: bottom
+    ui_bksp:
+      align: top
+    op_del:
+      align: top
+    nm_ret:
+      align: bottom
+    scq_bksp:
+      align: top
+      offset: 0.08
+    cd_grave:
+      align: bottom
+      offset: 0.1
+    softoff:
+      align: top
     combo_to_2:
       align: top
     combo_to_3:
