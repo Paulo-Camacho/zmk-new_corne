@@ -19,29 +19,23 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 ## Layer 0 — BASE
 
 ```
-LEFT HAND                              JOYSTICK                 RIGHT HAND
-┌────┬────┬────┬────┬────┬────┐       ┌───┐       ┌────┬────┬────┬────┬────┬────┐
-│Tab │ Q  │ W  │ E  │ R  │ T  │       │ ▲ │       │ Y  │ U  │ I  │ O  │ P  │Bsp │
-├────┼────┼────┼────┼────┼────┤       │◄─┼─►│       ├────┼────┼────┼────┼────┼────┤
-│Cmd │ A  │ S  │ D  │ F  │ G  │       │Spc│       │ H  │ J  │ K  │ L  │ ;  │ '  │
-├────┼────┼────┼────┼────┼────┤       │ ▼ │       ├────┼────┼────┼────┼────┼────┤
-│Shft│ Z  │ X  │ C  │ V  │ B  │       └───┘       │ N  │ M  │ ,  │ .  │ /  │ `  │
-│    │    │    │    │    │Ret │                   │    │    │    │    │    │    │
-└────┴────┴────┴────┴────┴────┘                   └────┴────┴────┴────┴────┴────┘
+LEFT HAND                              (joystick unbound)       RIGHT HAND
+┌────┬────┬────┬────┬────┬────┐                            ┌────┬────┬────┬────┬────┬────┐
+│Tab │ Q  │ W  │ E  │ R  │ T  │                            │ Y  │ U  │ I  │ O  │ P  │Bsp │
+├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
+│Cmd │ A  │ S  │ D  │ F  │ G  │                            │ H  │ J  │ K  │ L  │ ;  │ '  │
+├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
+│Shft│ Z  │ X  │ C  │ V  │ B  │                            │ N  │ M  │ ,  │ .  │ /  │ `  │
+│    │    │    │    │    │Ret │                            │    │    │    │    │    │    │
+└────┴────┴────┴────┴────┴────┘                            └────┴────┴────┴────┴────┴────┘
      ┌────┐ ┌────┐ ┌────┐              ┌──────────┬──────────┬──────────┐
-     │Ctrl│ │Opt │ │Num │              │Enter / Fn│  Space   │Alt / Sym │
+     │Ctrl│ │Opt │ │Num │              │   Sym    │  Space   │ Alt / Fn │
      └────┘ └────┘ └────┘              └──────────┴──────────┴──────────┘
 ```
 
-### Joystick (BASE layer)
+### Joystick (all layers)
 
-| Input | Action |
-|-------|--------|
-| ▲ | Up arrow |
-| ▼ | Down arrow |
-| ◄ | Left arrow |
-| ► | Right arrow |
-| Press | **Space** |
+All 5-way joystick keys are unbound (`&none`). Use thumb **Space**, **Enter** (below `B`), or **NUMBER layer** arrows instead.
 
 ### Encoder (left half)
 
@@ -70,7 +64,7 @@ Also: mouse movement via joystick directions on this layer.
 
 ## Layer 2 — SYMBOL
 
-Hold **right inner thumb** (between Enter and Alt).
+Hold **right inner thumb**.
 
 ```
 TOP:    !  @  #  $  %  |  ^  &  *  (  )  Bsp
@@ -85,7 +79,7 @@ Optimized for programming: brackets and operators on the home row.
 
 ## Layer 3 — Fn
 
-Hold **Space** or **Enter** (layer-tap).
+Hold **right outer thumb** (tap Alt, hold for Fn).
 
 ```
 TOP:    Studio F1 F2 F3 F4 F5  |  F6  F7  F8  F9  F10 F11
@@ -143,9 +137,9 @@ Combos work on **BASE layer only** unless noted.
 | Left pinky (`A` row) | Command (⌘) | — |
 | Bottom-left (`Z` row) | Shift | — |
 | Left thumbs | Ctrl · Option · NUMBER layer | Hold for layer |
-| Right inner thumb | Enter | Fn layer |
+| Right inner thumb | — | **SYMBOL** layer |
 | Right middle thumb | **Space** | — |
-| Right outer thumb | Alt | SYMBOL layer |
+| Right outer thumb | Alt | **Fn** layer |
 
 ---
 
