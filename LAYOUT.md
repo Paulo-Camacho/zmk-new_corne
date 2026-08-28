@@ -11,8 +11,8 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 |-------|------|-----------------|---------|
 | 0 | **BASE** | Default | QWERTY typing + combos |
 | 1 | **NUMBER** | Hold left inner thumb (`mo 1`) | Numbers, arrows, Bluetooth, RGB |
-| 2 | **SYMBOL** | Hold right outer thumb | Code symbols `[]{}()` etc. |
-| 3 | **Fn** | Hold Enter (`lt 3`) | F-keys, reset, Studio unlock |
+| 2 | **SYMBOL** | Hold right inner thumb | Code symbols `[]{}()` etc. |
+| 3 | **Fn** | Hold right outer thumb | F-keys, reset, Studio unlock |
 
 ---
 
@@ -28,9 +28,9 @@ LEFT HAND                              JOYSTICK                 RIGHT HAND
 │Shft│ Z  │ X  │ C  │ V  │ B  │       └───┘       │ N  │ M  │ ,  │ .  │ /  │ `  │
 │    │    │    │    │    │Ret │                   │    │    │    │    │    │    │
 └────┴────┴────┴────┴────┴────┘                   └────┴────┴────┴────┴────┴────┘
-     ┌────┐ ┌────┐ ┌────┐              ┌──────────┐ ┌────┐ ┌────┐
-     │Ctrl│ │Opt │ │Num │              │Enter / Fn│ │Sym │ │Alt │
-     └────┘ └────┘ └────┘              └──────────┘ └────┘ └────┘
+     ┌────┐ ┌────┐ ┌────┐              ┌──────────┬──────────┬──────────┐
+     │Ctrl│ │Opt │ │Num │              │Enter / Fn│  Space   │Alt / Sym │
+     └────┘ └────┘ └────┘              └──────────┴──────────┴──────────┘
 ```
 
 ### Joystick (BASE layer)
@@ -145,7 +145,7 @@ Combos work on **BASE layer only** unless noted.
 | Left thumbs | Ctrl · Option · NUMBER layer | Hold for layer |
 | Right inner thumb | Enter | Fn layer |
 | Right middle thumb | **Space** | — |
-| Right outer thumb | Alt | — |
+| Right outer thumb | Alt | SYMBOL layer |
 
 ---
 
