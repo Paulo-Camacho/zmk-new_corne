@@ -154,7 +154,8 @@ Combos work on **BASE layer only** unless noted.
 2. **Brackets** — hold right thumb for SYMBOL, then `F`/`G` for `[` `]`, or `H`/`J` for `{` `}`.
 3. **Arrows** — joystick on BASE; also available on NUMBER layer.
 4. **Tab** — `D+F` combo without moving to thumb keys.
-5. **Backspace** — `U+I` or `;+'` combos, or dedicated key on top row.
+5. **Enter** — inner key below `B`, or `N+M` combo.
+6. **Space** — joystick press (center), or `N+M` combo for enter alternative.
 
 ---
 
