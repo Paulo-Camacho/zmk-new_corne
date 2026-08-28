@@ -4,9 +4,6 @@ manifest:
       path: zmk
       url: __VENDOR_ZMK_URL__
       revision: vendor
-      import:
-        path: app/west.yml
-        name-blocklist:
-          - zmk-studio-messages
+      import: app/west.yml
   self:
     path: config
