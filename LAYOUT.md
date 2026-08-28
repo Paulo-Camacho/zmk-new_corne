@@ -11,7 +11,7 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 |-------|------|-----------------|---------|
 | 0 | **BASE** | Default | QWERTY typing + combos |
 | 1 | **NUMBER** | Hold left inner thumb (`mo 1`) | Numbers, arrows, Bluetooth, RGB |
-| 2 | **SYMBOL** | Hold right inner thumb (`mo 2`) | Code symbols `[]{}()` etc. |
+| 2 | **SYMBOL** | Hold right outer thumb | Code symbols `[]{}()` etc. |
 | 3 | **Fn** | Hold Enter (`lt 3`) | F-keys, reset, Studio unlock |
 
 ---
@@ -144,7 +144,8 @@ Combos work on **BASE layer only** unless noted.
 | Bottom-left (`Z` row) | Shift | — |
 | Left thumbs | Ctrl · Option · NUMBER layer | Hold for layer |
 | Right inner thumb | Enter | Fn layer |
-| Right middle thumb | — | SYMBOL layer |
+| Right middle thumb | **Space** | — |
+| Right outer thumb | Alt | — |
 
 ---
 
