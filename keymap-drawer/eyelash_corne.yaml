@@ -14,7 +14,7 @@ layers:
   - O
   - P
   - {t: '$$mdi:backspace$$', type: backspace}
-  - $$mdi:apple-keyboard-command$$
+  - LGUI
   - A
   - S
   - D
@@ -93,8 +93,8 @@ layers:
   - END
   - PG DN
   - {t: '$$mdi:transfer$$', type: trans}
-  - {type: held}
   - {t: '$$mdi:transfer$$', type: trans}
+  - {type: held}
   - INS
   - $$mdi:backspace-reverse-outline$$
   - {t: '$$mdi:transfer$$', type: trans}
@@ -114,18 +114,19 @@ layers:
   - {t: '$$mdi:backspace$$', type: backspace}
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
-  - '-'
-  - '='
-  - '['
-  - ']'
+  - {t: '-', s: _}
+  - {t: '=', s: +}
+  - {t: '[', s: '{'}
+  - {t: ']', s: '}'}
   - {t: '$$mdi:menu-left$$', s: '$$mdi:mouse$$'}
   - $$mdi:mouse-left-click-outline$$
   - {t: '$$mdi:menu-right$$', s: '$$mdi:mouse$$'}
   - '{'
   - '}'
   - '|'
-  - '`'
-  - '"'
+  - {t: '`', s: '~'}
+  - DQUOT
+  - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
   - _
@@ -135,10 +136,12 @@ layers:
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:menu-down$$', s: '$$mdi:mouse$$'}
   - '~'
-  - /
-  - ;
+  - {t: /, s: '?'}
+  - {t: ;, s: ':'}
   - ':'
   - $$mdi:backspace-reverse-outline$$
+  - {t: '$$mdi:transfer$$', type: trans}
+  - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:keyboard-return$$', type: enter}
@@ -189,24 +192,42 @@ layers:
   - PAUSE BREAK
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
+  - {t: '$$mdi:transfer$$', type: trans}
   - {type: held}
-  - {type: held alternate}
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
 combos:
 - p: [23, 24]
-  k: ESC
+  k: $$mdi:keyboard-esc$$
+  l: [BASE]
+  a: bottom
+  o: 0.05
 - p: [16, 17]
-  k: TAB
+  k: $$mdi:keyboard-tab$$
+  l: [BASE]
+  a: bottom
 - p: [8, 9]
-  k: BSPC
+  k: {t: '$$mdi:backspace$$', type: backspace}
+  l: [BASE]
+  a: top
 - p: [10, 11]
-  k: DEL
+  k: $$mdi:backspace-reverse-outline$$
+  l: [BASE]
+  a: top
 - p: [36, 37]
-  k: ENTER
+  k: {t: '$$mdi:keyboard-return$$', type: enter}
+  l: [BASE]
+  a: bottom
 - p: [26, 27]
-  k: BSPC
+  k: {t: '$$mdi:backspace$$', type: backspace}
+  l: [BASE]
+  a: top
+  o: 0.08
 - p: [38, 39]
-  k: '`'
+  k: {t: '`', s: '~'}
+  l: [BASE, SYMBOL]
+  a: bottom
+  o: 0.1
 - p: [1, 15, 29]
   k: '&soft_off'
+  a: top
