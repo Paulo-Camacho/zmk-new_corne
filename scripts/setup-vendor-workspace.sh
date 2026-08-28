@@ -27,7 +27,7 @@ rm -rf "$ROOT/modules/msgs/zmk-studio-messages"
 cp -a "$ROOT/vendor/zmk-studio-messages" "$ROOT/modules/msgs/zmk-studio-messages"
 init_vendor_git_repo "$ROOT/modules/msgs/zmk-studio-messages" vendor
 
-ZMK_FILE_URL="file://${ROOT}/vendor/zmk"
+ZMK_FILE_URL="file://${ROOT}/zmk"
 sed "s|__VENDOR_ZMK_URL__|${ZMK_FILE_URL}|g" "$ROOT/config/west.yml" > "$ROOT/config/west.resolved.yml"
 mv "$ROOT/config/west.resolved.yml" "$ROOT/config/west.yml"
 
