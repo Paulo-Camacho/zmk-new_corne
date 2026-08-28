@@ -1,0 +1,58 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+menuconfig ZMK_SPLIT
+    bool "Split keyboard support"
+
+if ZMK_SPLIT
+
+config ZMK_SPLIT_ROLE_CENTRAL
+    bool "Split central device"
+
+config ZMK_SPLIT_BLE
+    bool "BLE Split"
+    default y
+    depends on ZMK_BLE
+    select BT_USER_PHY_UPDATE
+    select BT_AUTO_PHY_UPDATE
+
+config ZMK_SPLIT_WIRED
+    bool "Wired Split"
+    default y
+    depends on DT_HAS_ZMK_WIRED_SPLIT_ENABLED
+    select SERIAL
+    select RING_BUFFER
+    select CRC
+
+config ZMK_SPLIT_PERIPHERAL_HID_INDICATORS
+    bool "Peripheral HID Indicators"
+    depends on ZMK_HID_INDICATORS
+    help
+      Enable propagating the HID (LED) Indicator state to the split peripheral(s).
+
+config ZMK_SPLIT_RELAY_EVENT
+    bool "Relay Events from Peripheral to Central"
+    help
+      Enable relaying events from the split peripheral to the central device.
+
+if ZMK_SPLIT_RELAY_EVENT
+
+config ZMK_SPLIT_RELAY_EVENT_TYPE_NAME_LEN
+    int "Maximum size of relay event type name in bytes"
+    default 4
+    help
+      Maximum size of the event name that can be sent from
+      peripheral to central via relay events.
+
+config ZMK_SPLIT_RELAY_EVENT_DATA_LEN
+    int "Maximum size of event payload to relay in bytes"
+    default 14
+    help
+        Maximum size of the event data payload that can be sent from
+        peripheral to central via relay events.
+endif # ZMK_SPLIT_RELAY_EVENT
+
+endif # ZMK_SPLIT
+
+rsource "bluetooth/Kconfig"
+rsource "wired/Kconfig"
