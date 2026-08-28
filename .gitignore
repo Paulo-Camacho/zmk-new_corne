@@ -3,3 +3,15 @@ zmk/
 modules/
 tools/
 .west/
+
+# west-managed projects fetched by `west update` (see config/west.yml).
+# The repo intentionally tracks zephyr/module.yml; the Zephyr checkout that
+# lands alongside it is ignored.
+/zephyr/*
+!/zephyr/module.yml
+/eyelash_corne/
+/zmk-behavior-runtime-sensor-rotate/
+/zmk-module-ble-management/
+/zmk-module-battery-history/
+/zmk-module-settings-rpc/
+/zmk-module-runtime-input-processor/
