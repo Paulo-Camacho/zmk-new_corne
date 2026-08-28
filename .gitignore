@@ -3,3 +3,4 @@ zmk/
 modules/
 tools/
 .west/
+# Vendored third-party sources are committed under vendor/

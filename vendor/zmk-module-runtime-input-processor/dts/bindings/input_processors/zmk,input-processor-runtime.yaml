@@ -1,0 +1,134 @@
+# Copyright (c) 2026 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+description: |
+  Runtime configurable input processor for ZMK.
+  Supports runtime configuration of scaling and rotation parameters.
+
+compatible: "zmk,input-processor-runtime"
+
+include: base.yaml
+
+properties:
+  processor-label:
+    type: string
+    required: true
+    description: |
+      Short label for the input processor (max 8 chars for BLE compatibility).
+      Used to identify the processor in runtime configuration.
+
+  type:
+    type: int
+    default: 0x02  # INPUT_EV_REL
+    description: Event type to process
+
+  x-codes:
+    type: array
+    required: true
+    description: X-axis input codes to process
+
+  y-codes:
+    type: array
+    required: true
+    description: Y-axis input codes to process
+
+  scale-multiplier:
+    type: int
+    default: 1
+    description: Initial scaling multiplier
+
+  scale-divisor:
+    type: int
+    default: 1
+    description: Initial scaling divisor
+
+  rotation-degrees:
+    type: int
+    default: 0
+    description: Initial rotation angle in degrees
+
+  track-remainders:
+    type: boolean
+    description: Track remainders for scaling operations (enabled if present)
+
+  temp-layer-transparent-behavior:
+    type: phandle
+    description: |
+      Behavior to compare against for transparent detection (typically &trans).
+      Used for efficient temp-layer layer deactivation logic.
+
+  temp-layer-kp-behavior:
+    type: phandle
+    description: |
+      Behavior to compare against for key press detection (typically &kp).
+      Used to identify modifier keys for temp-layer layer deactivation logic.
+
+  temp-layer-keep-keycodes:
+    type: array
+    description: |
+      List of modifier keycodes that should not deactivate the temp-layer layer.
+      Typically includes LCTRL, LSHIFT, LALT, LGUI, RCTRL, RSHIFT, RALT, RGUI.
+
+  temp-layer-enabled:
+    type: boolean
+    description: If present, temp-layer layer is enabled by default
+
+  temp-layer:
+    type: int
+    default: 0
+    description: Default target layer ID for temp-layer
+
+  temp-layer-activation-delay-ms:
+    type: int
+    default: 100
+    description: Default delay before activating temp-layer layer (milliseconds)
+
+  temp-layer-deactivation-delay-ms:
+    type: int
+    default: 500
+    description: Default delay before deactivating temp-layer layer after input stops (milliseconds)
+
+  active-layers:
+    type: int
+    default: 0
+    description: |
+      Bitmask of layers where processor should be active (0 = all layers).
+      Each bit represents a layer: bit 0 = layer 0, bit 1 = layer 1, etc.
+      If at least one specified layer is active, the processor works.
+
+  axis-snap-mode:
+    type: int
+    default: 0
+    description: |
+      Axis snapping mode: 0 = none, 1 = snap to X axis, 2 = snap to Y axis.
+      When enabled, movement is locked to the selected axis unless threshold is exceeded.
+
+  axis-snap-threshold:
+    type: int
+    default: 100
+    description: |
+      Threshold for axis snap unlock. When cross-axis movement exceeds this value
+      within the timeout window, the snap lock is released.
+
+  axis-snap-timeout-ms:
+    type: int
+    default: 1000
+    description: |
+      Time window (in milliseconds) for checking if cross-axis movement exceeds threshold.
+      If threshold is not exceeded within this time, the snap lock window resets.
+
+  xy-to-scroll-enabled:
+    type: boolean
+    description: If present, XY to scroll conversion is enabled
+
+  xy-swap-enabled:
+    type: boolean
+    description: If present, swap X and Y axis values
+
+  x-invert:
+    type: boolean
+    description: If present, invert X axis values (positive becomes negative and vice versa)
+
+  y-invert:
+    type: boolean
+    description: If present, invert Y axis values (positive becomes negative and vice versa)

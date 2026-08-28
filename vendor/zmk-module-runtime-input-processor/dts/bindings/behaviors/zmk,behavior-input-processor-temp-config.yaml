@@ -1,0 +1,32 @@
+# Copyright (c) 2026 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+description: |
+  Behavior to temporarily change input processor configuration while a key is held.
+  Useful for temporarily changing DPI/speed of pointing devices.
+
+compatible: "zmk,behavior-input-processor-temp-config"
+
+include: zero_param.yaml
+
+
+properties:
+  processor-name:
+    type: string
+    required: true
+    description: Name of the runtime input processor to modify
+
+  scale-multiplier:
+    type: int
+    description: Temporary scaling multiplier (0 = no change)
+    default: 1
+
+  scale-divisor:
+    type: int
+    description: Temporary scaling divisor (0 = no change)
+    default: 1
+
+  rotation-degrees:
+    type: int
+    description: Temporary rotation angle in degrees (0 = no change)
+    default: 0

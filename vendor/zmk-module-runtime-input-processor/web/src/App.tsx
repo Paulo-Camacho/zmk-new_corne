@@ -1,0 +1,1117 @@
+/**
+ * ZMK Module Template - Main Application
+ * Demonstrates custom RPC communication with a ZMK device
+ */
+
+import { useContext, useState, useEffect, useMemo, useCallback } from "react";
+import "./App.css";
+import { connect as serial_connect } from "@zmkfirmware/zmk-studio-ts-client/transport/serial";
+import {
+  ZMKConnection,
+  ZMKCustomSubsystem,
+  ZMKAppContext,
+} from "@cormoran/zmk-studio-react-hook";
+import {
+  Request,
+  Response,
+  InputProcessorInfo,
+  Notification,
+  AxisSnapMode,
+} from "./proto/cormoran/rip/custom";
+
+// Custom subsystem identifier - must match firmware registration
+export const SUBSYSTEM_IDENTIFIER = "cormoran_rip";
+
+function App() {
+  return (
+    <div className="app">
+      <header className="app-header">
+        <h1>🔧 ZMK Runtime Input Processor</h1>
+        <p>Configure input processor settings at runtime</p>
+      </header>
+
+      <ZMKConnection
+        renderDisconnected={({ connect, isLoading, error }) => (
+          <section className="card">
+            <h2>Device Connection</h2>
+            {isLoading && <p>⏳ Connecting...</p>}
+            {error && (
+              <div className="error-message">
+                <p>🚨 {error}</p>
+              </div>
+            )}
+            {!isLoading && (
+              <button
+                className="btn btn-primary"
+                onClick={() => connect(serial_connect)}
+              >
+                🔌 Connect Serial
+              </button>
+            )}
+          </section>
+        )}
+        renderConnected={({ disconnect, deviceName }) => (
+          <>
+            <section className="card">
+              <h2>Device Connection</h2>
+              <div className="device-info">
+                <h3>✅ Connected to: {deviceName}</h3>
+              </div>
+              <button className="btn btn-secondary" onClick={disconnect}>
+                Disconnect
+              </button>
+            </section>
+
+            <InputProcessorManager />
+          </>
+        )}
+      />
+
+      <footer className="app-footer">
+        <p>
+          <strong>Runtime Input Processor Module</strong> - Configure pointing
+          device behavior
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+export function InputProcessorManager() {
+  const zmkApp = useContext(ZMKAppContext);
+  const [processors, setProcessors] = useState<InputProcessorInfo[]>([]);
+  const [selectedProcessorId, setSelectedProcessorId] = useState<number | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Layer information
+  const [layers, setLayers] = useState<Array<{ index: number; name: string }>>(
+    []
+  );
+
+  // Form state
+  const [scaleMultiplier, setScaleMultiplier] = useState<number>(1);
+  const [scaleDivisor, setScaleDivisor] = useState<number>(1);
+  const [rotationDegrees, setRotationDegrees] = useState<number>(0);
+
+  // Temp-layer layer state
+  const [tempLayerEnabled, setTempLayerEnabled] = useState<boolean>(false);
+  const [tempLayerLayer, setTempLayerLayer] = useState<number>(0);
+  const [tempLayerActivationDelay, setTempLayerActivationDelay] =
+    useState<number>(100);
+  const [tempLayerDeactivationDelay, setTempLayerDeactivationDelay] =
+    useState<number>(500);
+
+  // Active layers state
+  const [activeLayers, setActiveLayers] = useState<number>(0);
+
+  // Axis snap state
+  const [axisSnapMode, setAxisSnapMode] = useState<AxisSnapMode>(
+    AxisSnapMode.AXIS_SNAP_MODE_NONE
+  );
+  const [axisSnapThreshold, setAxisSnapThreshold] = useState<number>(100);
+  const [axisSnapTimeout, setAxisSnapTimeout] = useState<number>(1000);
+
+  // Code mapping state
+  const [xyToScrollEnabled, setXyToScrollEnabled] = useState<boolean>(false);
+  const [xySwapEnabled, setXySwapEnabled] = useState<boolean>(false);
+  // Axis invert state
+  const [xInvert, setXInvert] = useState<boolean>(false);
+  const [yInvert, setYInvert] = useState<boolean>(false);
+
+  const subsystem = useMemo(
+    () => zmkApp?.findSubsystem(SUBSYSTEM_IDENTIFIER),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [zmkApp?.state.customSubsystems]
+  );
+
+  const callRPC = useCallback(
+    async (request: Request): Promise<Response | null> => {
+      if (!zmkApp?.state.connection || !subsystem) return null;
+      try {
+        const service = new ZMKCustomSubsystem(
+          zmkApp.state.connection,
+          subsystem.index
+        );
+
+        const payload = Request.encode(request).finish();
+        const responsePayload = await service.callRPC(payload);
+
+        if (responsePayload) {
+          return Response.decode(responsePayload);
+        }
+      } catch (err) {
+        console.error("RPC call failed:", err);
+        throw err;
+      }
+      return null;
+    },
+    [zmkApp?.state.connection, subsystem]
+  );
+
+  const loadProcessors = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Request list of input processors - notifications will be sent for each processor
+      const request = Request.create({
+        listInputProcessors: {},
+      });
+
+      const resp = await callRPC(request);
+      if (resp?.error) {
+        setError(resp.error.message);
+      }
+      // Response is empty - processors will arrive via notifications
+    } catch (err) {
+      setError(
+        `Failed to load processors: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [callRPC]);
+
+  const loadLayerInfo = useCallback(async () => {
+    try {
+      const request = Request.create({
+        getLayerInfo: {},
+      });
+
+      const resp = await callRPC(request);
+      if (resp?.getLayerInfo?.layers) {
+        setLayers(resp.getLayerInfo.layers);
+      } else if (resp?.error) {
+        console.error("Failed to load layer info:", resp.error.message);
+      }
+    } catch (err) {
+      console.error("Failed to load layer info:", err);
+    }
+  }, [callRPC]);
+
+  const updateProcessor = useCallback(async () => {
+    if (selectedProcessorId === null) return;
+
+    const currentProcessor = processors.find(
+      (p) => p.id === selectedProcessorId
+    );
+    if (!currentProcessor) return;
+
+    setIsLoading(true);
+    setError(null);
+    setIsUpdating(true);
+
+    try {
+      // Only send requests for fields that have actually changed
+      if (currentProcessor.scaleMultiplier !== scaleMultiplier) {
+        const mulRequest = Request.create({
+          setScaleMultiplier: {
+            id: selectedProcessorId,
+            value: scaleMultiplier,
+          },
+        });
+        const mulResp = await callRPC(mulRequest);
+        if (mulResp?.error) {
+          setError(mulResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.scaleDivisor !== scaleDivisor) {
+        const divRequest = Request.create({
+          setScaleDivisor: {
+            id: selectedProcessorId,
+            value: scaleDivisor,
+          },
+        });
+        const divResp = await callRPC(divRequest);
+        if (divResp?.error) {
+          setError(divResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.rotationDegrees !== rotationDegrees) {
+        const rotRequest = Request.create({
+          setRotation: {
+            id: selectedProcessorId,
+            value: rotationDegrees,
+          },
+        });
+        const rotResp = await callRPC(rotRequest);
+        if (rotResp?.error) {
+          setError(rotResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.tempLayerEnabled !== tempLayerEnabled) {
+        const enabledRequest = Request.create({
+          setTempLayerEnabled: {
+            id: selectedProcessorId,
+            enabled: tempLayerEnabled,
+          },
+        });
+        const enabledResp = await callRPC(enabledRequest);
+        if (enabledResp?.error) {
+          setError(enabledResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.tempLayerLayer !== tempLayerLayer) {
+        const layerRequest = Request.create({
+          setTempLayerLayer: {
+            id: selectedProcessorId,
+            layer: tempLayerLayer,
+          },
+        });
+        const layerResp = await callRPC(layerRequest);
+        if (layerResp?.error) {
+          setError(layerResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (
+        currentProcessor.tempLayerActivationDelayMs !== tempLayerActivationDelay
+      ) {
+        const actDelayRequest = Request.create({
+          setTempLayerActivationDelay: {
+            id: selectedProcessorId,
+            activationDelayMs: tempLayerActivationDelay,
+          },
+        });
+        const actDelayResp = await callRPC(actDelayRequest);
+        if (actDelayResp?.error) {
+          setError(actDelayResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (
+        currentProcessor.tempLayerDeactivationDelayMs !==
+        tempLayerDeactivationDelay
+      ) {
+        const deactDelayRequest = Request.create({
+          setTempLayerDeactivationDelay: {
+            id: selectedProcessorId,
+            deactivationDelayMs: tempLayerDeactivationDelay,
+          },
+        });
+        const deactDelayResp = await callRPC(deactDelayRequest);
+        if (deactDelayResp?.error) {
+          setError(deactDelayResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.activeLayers !== activeLayers) {
+        const activeLayersRequest = Request.create({
+          setActiveLayers: {
+            id: selectedProcessorId,
+            layers: activeLayers,
+          },
+        });
+        const activeLayersResp = await callRPC(activeLayersRequest);
+        if (activeLayersResp?.error) {
+          setError(activeLayersResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.axisSnapMode !== axisSnapMode) {
+        const axisSnapModeRequest = Request.create({
+          setAxisSnapMode: {
+            id: selectedProcessorId,
+            mode: axisSnapMode,
+          },
+        });
+        const axisSnapModeResp = await callRPC(axisSnapModeRequest);
+        if (axisSnapModeResp?.error) {
+          setError(axisSnapModeResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.axisSnapThreshold !== axisSnapThreshold) {
+        const axisSnapThresholdRequest = Request.create({
+          setAxisSnapThreshold: {
+            id: selectedProcessorId,
+            threshold: axisSnapThreshold,
+          },
+        });
+        const axisSnapThresholdResp = await callRPC(axisSnapThresholdRequest);
+        if (axisSnapThresholdResp?.error) {
+          setError(axisSnapThresholdResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.axisSnapTimeoutMs !== axisSnapTimeout) {
+        const axisSnapTimeoutRequest = Request.create({
+          setAxisSnapTimeout: {
+            id: selectedProcessorId,
+            timeoutMs: axisSnapTimeout,
+          },
+        });
+        const axisSnapTimeoutResp = await callRPC(axisSnapTimeoutRequest);
+        if (axisSnapTimeoutResp?.error) {
+          setError(axisSnapTimeoutResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.xyToScrollEnabled !== xyToScrollEnabled) {
+        const xyToScrollRequest = Request.create({
+          setXyToScrollEnabled: {
+            id: selectedProcessorId,
+            enabled: xyToScrollEnabled,
+          },
+        });
+        const xyToScrollResp = await callRPC(xyToScrollRequest);
+        if (xyToScrollResp?.error) {
+          setError(xyToScrollResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.xInvert !== xInvert) {
+        const xInvertRequest = Request.create({
+          setXInvert: {
+            id: selectedProcessorId,
+            invert: xInvert,
+          },
+        });
+        const xInvertResp = await callRPC(xInvertRequest);
+        if (xInvertResp?.error) {
+          setError(xInvertResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.xySwapEnabled !== xySwapEnabled) {
+        const xySwapRequest = Request.create({
+          setXySwapEnabled: {
+            id: selectedProcessorId,
+            enabled: xySwapEnabled,
+          },
+        });
+        const xySwapResp = await callRPC(xySwapRequest);
+        if (xySwapResp?.error) {
+          setError(xySwapResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      if (currentProcessor.yInvert !== yInvert) {
+        const yInvertRequest = Request.create({
+          setYInvert: {
+            id: selectedProcessorId,
+            invert: yInvert,
+          },
+        });
+        const yInvertResp = await callRPC(yInvertRequest);
+        if (yInvertResp?.error) {
+          setError(yInvertResp.error.message);
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Updates will come via notifications
+    } catch (err) {
+      setError(
+        `Failed to update processor: ${err instanceof Error ? err.message : "Unknown error"}`
+      );
+    } finally {
+      setIsLoading(false);
+      setIsUpdating(false);
+    }
+  }, [
+    callRPC,
+    processors,
+    selectedProcessorId,
+    scaleMultiplier,
+    scaleDivisor,
+    rotationDegrees,
+    tempLayerEnabled,
+    tempLayerLayer,
+    tempLayerActivationDelay,
+    tempLayerDeactivationDelay,
+    activeLayers,
+    axisSnapMode,
+    axisSnapThreshold,
+    axisSnapTimeout,
+    xyToScrollEnabled,
+    xySwapEnabled,
+    xInvert,
+    yInvert,
+  ]);
+
+  const selectProcessor = useCallback(
+    (id: number) => {
+      const proc = processors.find((p) => p.id === id);
+      if (proc) {
+        setSelectedProcessorId(id);
+        setScaleMultiplier(proc.scaleMultiplier);
+        setScaleDivisor(proc.scaleDivisor);
+        setRotationDegrees(proc.rotationDegrees);
+        setTempLayerEnabled(proc.tempLayerEnabled);
+        setTempLayerLayer(proc.tempLayerLayer);
+        setTempLayerActivationDelay(proc.tempLayerActivationDelayMs);
+        setTempLayerDeactivationDelay(proc.tempLayerDeactivationDelayMs);
+        setActiveLayers(proc.activeLayers);
+        setAxisSnapMode(proc.axisSnapMode);
+        setAxisSnapThreshold(proc.axisSnapThreshold);
+        setAxisSnapTimeout(proc.axisSnapTimeoutMs);
+        setXyToScrollEnabled(proc.xyToScrollEnabled);
+        setXySwapEnabled(proc.xySwapEnabled);
+        setXInvert(proc.xInvert);
+        setYInvert(proc.yInvert);
+      }
+    },
+    [processors]
+  );
+
+  useEffect(() => {
+    if (subsystem) {
+      loadProcessors();
+      loadLayerInfo();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subsystem]);
+
+  // Subscribe to notifications for processor changes
+  useEffect(() => {
+    if (!zmkApp || !subsystem) return;
+
+    const unsubscribe = zmkApp.onNotification({
+      type: "custom",
+      subsystemIndex: subsystem.index,
+      callback: (notification) => {
+        try {
+          // notification.payload contains the encoded Notification message
+          const decoded = Notification.decode(notification.payload);
+          if (decoded.inputProcessorChanged?.processor) {
+            const proc = decoded.inputProcessorChanged.processor;
+
+            // Update or add processor to the list
+            setProcessors((prev) => {
+              const existingIndex = prev.findIndex((p) => p.id === proc.id);
+              if (existingIndex >= 0) {
+                // Update existing processor
+                const updated = [...prev];
+                updated[existingIndex] = proc;
+                return updated;
+              } else {
+                // Add new processor
+                return [...prev, proc];
+              }
+            });
+
+            // If this is the currently selected processor, update form values
+            // Skip updates if we're currently updating to prevent overwriting user changes
+            if (selectedProcessorId === proc.id && !isUpdating) {
+              setScaleMultiplier(proc.scaleMultiplier);
+              setScaleDivisor(proc.scaleDivisor);
+              setRotationDegrees(proc.rotationDegrees);
+              setTempLayerEnabled(proc.tempLayerEnabled);
+              setTempLayerLayer(proc.tempLayerLayer);
+              setTempLayerActivationDelay(proc.tempLayerActivationDelayMs);
+              setTempLayerDeactivationDelay(proc.tempLayerDeactivationDelayMs);
+              setActiveLayers(proc.activeLayers);
+              setAxisSnapMode(proc.axisSnapMode);
+              setAxisSnapThreshold(proc.axisSnapThreshold);
+              setAxisSnapTimeout(proc.axisSnapTimeoutMs);
+              setXyToScrollEnabled(proc.xyToScrollEnabled);
+              setXySwapEnabled(proc.xySwapEnabled);
+              setXInvert(proc.xInvert);
+              setYInvert(proc.yInvert);
+            }
+
+            // If no processor is selected yet, select the first one
+            if (selectedProcessorId === null) {
+              setSelectedProcessorId(proc.id);
+              setScaleMultiplier(proc.scaleMultiplier);
+              setScaleDivisor(proc.scaleDivisor);
+              setRotationDegrees(proc.rotationDegrees);
+              setTempLayerEnabled(proc.tempLayerEnabled);
+              setTempLayerLayer(proc.tempLayerLayer);
+              setTempLayerActivationDelay(proc.tempLayerActivationDelayMs);
+              setTempLayerDeactivationDelay(proc.tempLayerDeactivationDelayMs);
+              setActiveLayers(proc.activeLayers);
+              setAxisSnapMode(proc.axisSnapMode);
+              setAxisSnapThreshold(proc.axisSnapThreshold);
+              setAxisSnapTimeout(proc.axisSnapTimeoutMs);
+              setXyToScrollEnabled(proc.xyToScrollEnabled);
+              setXySwapEnabled(proc.xySwapEnabled);
+              setXInvert(proc.xInvert);
+              setYInvert(proc.yInvert);
+            }
+          }
+        } catch (err) {
+          console.error("Failed to decode notification:", err);
+        }
+      },
+    });
+
+    return unsubscribe;
+  }, [zmkApp, subsystem, selectedProcessorId, isUpdating]);
+
+  if (!zmkApp) return null;
+
+  if (!subsystem) {
+    return (
+      <section className="card">
+        <div className="warning-message">
+          <p>
+            ⚠️ Subsystem "{SUBSYSTEM_IDENTIFIER}" not found. Make sure your
+            firmware includes the runtime input processor module.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      <section className="card">
+        <h2>Input Processors</h2>
+        {error && (
+          <div className="error-message">
+            <p>🚨 {error}</p>
+          </div>
+        )}
+
+        <div style={{ marginBottom: "1rem" }}>
+          <button
+            className="btn btn-primary"
+            onClick={loadProcessors}
+            disabled={isLoading}
+          >
+            {isLoading ? "⏳ Loading..." : "🔄 Refresh List"}
+          </button>
+        </div>
+
+        {processors.length === 0 && !isLoading && (
+          <p>No input processors found. Configure them in your device tree.</p>
+        )}
+
+        {processors.length > 0 && (
+          <div className="processor-list">
+            {processors.map((proc) => (
+              <div
+                key={proc.id}
+                className={`processor-item ${selectedProcessorId === proc.id ? "selected" : ""}`}
+                onClick={() => selectProcessor(proc.id)}
+                style={{
+                  padding: "0.75rem",
+                  margin: "0.5rem 0",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  backgroundColor:
+                    selectedProcessorId === proc.id ? "#e3f2fd" : "transparent",
+                }}
+              >
+                <strong>{proc.name}</strong>
+                <div
+                  style={{
+                    fontSize: "0.9em",
+                    color: "#666",
+                    marginTop: "0.25rem",
+                  }}
+                >
+                  Scale: {proc.scaleMultiplier}/{proc.scaleDivisor} | Rotation:{" "}
+                  {proc.rotationDegrees}°
+                  {proc.tempLayerEnabled &&
+                    ` | Temp-Layer: Layer ${proc.tempLayerLayer}`}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {selectedProcessorId !== null && (
+        <section className="card">
+          <h2>
+            Configure:{" "}
+            {processors.find((p) => p.id === selectedProcessorId)?.name}
+          </h2>
+
+          <div className="input-group">
+            <label htmlFor="scale-multiplier">Scaling Multiplier:</label>
+            <input
+              id="scale-multiplier"
+              type="number"
+              min="1"
+              value={scaleMultiplier}
+              onChange={(e) =>
+                setScaleMultiplier(parseInt(e.target.value) || 1)
+              }
+            />
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="scale-divisor">Scaling Divisor:</label>
+            <input
+              id="scale-divisor"
+              type="number"
+              min="1"
+              value={scaleDivisor}
+              onChange={(e) => setScaleDivisor(parseInt(e.target.value) || 1)}
+            />
+          </div>
+
+          <div
+            style={{
+              marginBottom: "1rem",
+              padding: "0.5rem",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "4px",
+            }}
+          >
+            <strong>Effective Scale:</strong>{" "}
+            {(scaleMultiplier / scaleDivisor).toFixed(2)}x
+            <div
+              style={{ fontSize: "0.9em", color: "#666", marginTop: "0.25rem" }}
+            >
+              Examples: 2/1 = 2x faster, 1/2 = 0.5x slower
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="rotation">Rotation (degrees):</label>
+            <input
+              id="rotation"
+              type="number"
+              min="-360"
+              max="360"
+              value={rotationDegrees}
+              onChange={(e) =>
+                setRotationDegrees(parseInt(e.target.value) || 0)
+              }
+            />
+          </div>
+
+          <hr style={{ margin: "1.5rem 0", border: "1px solid #e0e0e0" }} />
+
+          <h3>Temp-Layer Layer</h3>
+          <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "1rem" }}>
+            Automatically activate a layer when using the pointing device
+          </p>
+
+          <div className="input-group">
+            <label htmlFor="temp-layer-enabled">
+              <input
+                id="temp-layer-enabled"
+                type="checkbox"
+                checked={tempLayerEnabled}
+                onChange={(e) => setTempLayerEnabled(e.target.checked)}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Enable Temp-Layer Layer
+            </label>
+          </div>
+
+          {tempLayerEnabled && (
+            <>
+              <div className="input-group">
+                <label htmlFor="temp-layer">Target Layer:</label>
+                <select
+                  id="temp-layer"
+                  value={tempLayerLayer}
+                  onChange={(e) =>
+                    setTempLayerLayer(parseInt(e.target.value) || 0)
+                  }
+                  style={{ padding: "0.5rem", fontSize: "1rem" }}
+                >
+                  {layers.length > 0
+                    ? layers.map((layer) => (
+                        <option key={layer.index} value={layer.index}>
+                          {layer.name} (Layer {layer.index})
+                        </option>
+                      ))
+                    : Array.from({ length: 16 }, (_, i) => i).map((i) => (
+                        <option key={i} value={i}>
+                          Layer {i}
+                        </option>
+                      ))}
+                </select>
+                <div
+                  style={{
+                    fontSize: "0.85em",
+                    color: "#666",
+                    marginTop: "0.25rem",
+                  }}
+                >
+                  Layer to activate when using pointing device
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="activation-delay">Activation Delay (ms):</label>
+                <input
+                  id="activation-delay"
+                  type="number"
+                  min="0"
+                  max="5000"
+                  step="10"
+                  value={tempLayerActivationDelay}
+                  onChange={(e) =>
+                    setTempLayerActivationDelay(parseInt(e.target.value) || 0)
+                  }
+                />
+                <div
+                  style={{
+                    fontSize: "0.85em",
+                    color: "#666",
+                    marginTop: "0.25rem",
+                  }}
+                >
+                  Delay before activating layer (0-5000ms)
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="deactivation-delay">
+                  Deactivation Delay (ms):
+                </label>
+                <input
+                  id="deactivation-delay"
+                  type="number"
+                  min="0"
+                  max="5000"
+                  step="10"
+                  value={tempLayerDeactivationDelay}
+                  onChange={(e) =>
+                    setTempLayerDeactivationDelay(parseInt(e.target.value) || 0)
+                  }
+                />
+                <div
+                  style={{
+                    fontSize: "0.85em",
+                    color: "#666",
+                    marginTop: "0.25rem",
+                  }}
+                >
+                  Delay before deactivating layer after input stops (0-5000ms)
+                </div>
+              </div>
+            </>
+          )}
+
+          <hr style={{ margin: "1.5rem 0", border: "1px solid #e0e0e0" }} />
+
+          <h3>Active Layers</h3>
+          <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "1rem" }}>
+            Select which layers the processor should be active on. If no layers
+            are selected (0), the processor works on all layers.
+          </p>
+
+          <div className="input-group">
+            <label htmlFor="active-layers">Layer Bitmask (hex):</label>
+            <input
+              id="active-layers"
+              type="text"
+              value={`0x${activeLayers.toString(16).toUpperCase().padStart(8, "0")}`}
+              onChange={(e) => {
+                const val = e.target.value.replace(/^0x/i, "");
+                const parsed = parseInt(val || "0", 16);
+                if (!isNaN(parsed)) {
+                  setActiveLayers(parsed);
+                }
+              }}
+              style={{ fontFamily: "monospace" }}
+            />
+            <div
+              style={{
+                fontSize: "0.85em",
+                color: "#666",
+                marginTop: "0.25rem",
+              }}
+            >
+              Bitmask: bit 0 = layer 0, bit 1 = layer 1, etc. (0x00000000 = all
+              layers)
+            </div>
+          </div>
+
+          <div
+            style={{
+              marginTop: "1rem",
+              padding: "0.75rem",
+              backgroundColor: "#f5f5f5",
+              borderRadius: "4px",
+            }}
+          >
+            <strong>Select Layers:</strong>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+                gap: "0.5rem",
+                marginTop: "0.5rem",
+              }}
+            >
+              {layers.length > 0 ? (
+                layers.map((layer) => (
+                  <label
+                    key={layer.index}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      fontSize: "0.9em",
+                      cursor: "pointer",
+                      padding: "0.25rem",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={(activeLayers & (1 << layer.index)) !== 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setActiveLayers(activeLayers | (1 << layer.index));
+                        } else {
+                          setActiveLayers(activeLayers & ~(1 << layer.index));
+                        }
+                      }}
+                      style={{ marginRight: "0.5rem" }}
+                    />
+                    {layer.name}
+                  </label>
+                ))
+              ) : (
+                <p style={{ fontSize: "0.9em", color: "#666" }}>
+                  Loading layers...
+                </p>
+              )}
+            </div>
+          </div>
+
+          <hr style={{ margin: "1.5rem 0", border: "1px solid #e0e0e0" }} />
+
+          <h3>Axis Snapping</h3>
+          <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "1rem" }}>
+            Lock scrolling to a specific axis. Movement on the other axis is
+            suppressed unless it exceeds the threshold within the timeout
+            window.
+          </p>
+
+          <div className="input-group">
+            <label htmlFor="axis-snap-mode">Snap Mode:</label>
+            <select
+              id="axis-snap-mode"
+              value={axisSnapMode}
+              onChange={(e) =>
+                setAxisSnapMode(parseInt(e.target.value) as AxisSnapMode)
+              }
+              style={{ padding: "0.5rem", fontSize: "1rem" }}
+            >
+              <option value={AxisSnapMode.AXIS_SNAP_MODE_NONE}>No Snap</option>
+              <option value={AxisSnapMode.AXIS_SNAP_MODE_X}>
+                Snap to X Axis
+              </option>
+              <option value={AxisSnapMode.AXIS_SNAP_MODE_Y}>
+                Snap to Y Axis
+              </option>
+            </select>
+            <div
+              style={{
+                fontSize: "0.85em",
+                color: "#666",
+                marginTop: "0.25rem",
+              }}
+            >
+              Select which axis to lock movement to
+            </div>
+          </div>
+
+          {axisSnapMode !== AxisSnapMode.AXIS_SNAP_MODE_NONE && (
+            <>
+              <div className="input-group">
+                <label htmlFor="axis-snap-threshold">Unlock Threshold:</label>
+                <input
+                  id="axis-snap-threshold"
+                  type="number"
+                  min="0"
+                  max="1000"
+                  step="10"
+                  value={axisSnapThreshold}
+                  onChange={(e) =>
+                    setAxisSnapThreshold(parseInt(e.target.value) || 0)
+                  }
+                />
+                <div
+                  style={{
+                    fontSize: "0.85em",
+                    color: "#666",
+                    marginTop: "0.25rem",
+                  }}
+                >
+                  Cross-axis movement required to unlock snap (0-1000)
+                </div>
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="axis-snap-timeout">Timeout Window (ms):</label>
+                <input
+                  id="axis-snap-timeout"
+                  type="number"
+                  min="0"
+                  max="5000"
+                  step="100"
+                  value={axisSnapTimeout}
+                  onChange={(e) =>
+                    setAxisSnapTimeout(parseInt(e.target.value) || 0)
+                  }
+                />
+                <div
+                  style={{
+                    fontSize: "0.85em",
+                    color: "#666",
+                    marginTop: "0.25rem",
+                  }}
+                >
+                  Time window for threshold check (0-5000ms)
+                </div>
+              </div>
+            </>
+          )}
+
+          <hr style={{ margin: "1.5rem 0", border: "1px solid #e0e0e0" }} />
+
+          <h3>Code Mapping</h3>
+          <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "1rem" }}>
+            Configure input code mapping features for your pointing device
+          </p>
+
+          <div className="input-group">
+            <label htmlFor="xy-to-scroll-enabled">
+              <input
+                id="xy-to-scroll-enabled"
+                type="checkbox"
+                checked={xyToScrollEnabled}
+                onChange={(e) => setXyToScrollEnabled(e.target.checked)}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Enable XY-to-Scroll Mapping
+            </label>
+            <div
+              style={{
+                fontSize: "0.85em",
+                color: "#666",
+                marginTop: "0.25rem",
+                marginLeft: "1.7rem",
+              }}
+            >
+              Map X/Y input to horizontal/vertical scroll wheel events
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="xy-swap-enabled">
+              <input
+                id="xy-swap-enabled"
+                type="checkbox"
+                checked={xySwapEnabled}
+                onChange={(e) => setXySwapEnabled(e.target.checked)}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Enable XY-Swap
+            </label>
+            <div
+              style={{
+                fontSize: "0.85em",
+                color: "#666",
+                marginTop: "0.25rem",
+                marginLeft: "1.7rem",
+              }}
+            >
+              Swap X and Y axes (Note: XY-to-scroll takes precedence)
+            </div>
+          </div>
+          <h3>Axis Inversion</h3>
+          <p style={{ fontSize: "0.9em", color: "#666", marginBottom: "1rem" }}>
+            Invert axis values to reverse input direction (e.g., 2 becomes -2)
+          </p>
+
+          <div className="input-group">
+            <label htmlFor="x-invert">
+              <input
+                id="x-invert"
+                type="checkbox"
+                checked={xInvert}
+                onChange={(e) => setXInvert(e.target.checked)}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Invert X Axis
+            </label>
+            <div
+              style={{
+                fontSize: "0.85em",
+                color: "#666",
+                marginTop: "0.25rem",
+                marginLeft: "1.5rem",
+              }}
+            >
+              Reverse horizontal input direction
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="y-invert">
+              <input
+                id="y-invert"
+                type="checkbox"
+                checked={yInvert}
+                onChange={(e) => setYInvert(e.target.checked)}
+                style={{ marginRight: "0.5rem" }}
+              />
+              Invert Y Axis
+            </label>
+            <div
+              style={{
+                fontSize: "0.85em",
+                color: "#666",
+                marginTop: "0.25rem",
+                marginLeft: "1.5rem",
+              }}
+            >
+              Reverse vertical input direction
+            </div>
+          </div>
+
+          <button
+            className="btn btn-primary"
+            onClick={updateProcessor}
+            disabled={isLoading}
+          >
+            {isLoading ? "⏳ Applying..." : "✅ Apply Settings"}
+          </button>
+        </section>
+      )}
+    </>
+  );
+}
+
+export default App;
