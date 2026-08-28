@@ -1,0 +1,40 @@
+/*
+* Copyright (c) 2025 The ZMK Contributors
+*
+* SPDX-License-Identifier: MIT
+*/
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+
+/ {
+	keymap {
+		compatible = "zmk,keymap";
+		
+		default_layer {
+			bindings = <
+			&kp N0
+			&kp N1
+			&kp N2
+			&kp N3
+			&kp N4
+			&kp N5
+			&kp N6
+			>;
+			sensor-bindings = <&sensor_rsr_left &sensor_rsr_right>;
+		};
+		
+		next_layer {
+			bindings = <
+			&kp N0
+			&kp N1
+			&kp N2
+			&kp N3
+			&kp N4
+			&kp N5
+			&kp N6
+			>;
+			sensor-bindings = <&sensor_rsr_left &sensor_rsr_right>;
+		};
+	};
+};

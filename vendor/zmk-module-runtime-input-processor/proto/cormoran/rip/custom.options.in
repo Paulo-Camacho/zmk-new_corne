@@ -1,0 +1,13 @@
+# Nanopb options file for custom.proto
+# This defines max sizes for string fields
+
+cormoran.rip.ErrorResponse.message   max_size:64
+
+# Runtime Input Processor field sizes
+cormoran.rip.InputProcessorInfo.name max_size:@CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN@
+cormoran.rip.GetInputProcessorRequest.name max_size:@CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN@
+cormoran.rip.SetScaleMultiplierRequest.name max_size:@CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN@
+cormoran.rip.SetScaleDivisorRequest.name max_size:@CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN@
+cormoran.rip.SetRotationRequest.name max_size:@CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN@
+cormoran.rip.ResetInputProcessorRequest.name max_size:@CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN@
+cormoran.rip.SetTempLayerRequest.name max_size:@CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN@

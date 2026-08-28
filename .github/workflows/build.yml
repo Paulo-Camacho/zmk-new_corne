@@ -1,10 +1,145 @@
-name: Build ZMK firmware
+name: Build ZMK firmware (vendored)
+
 on:
   workflow_dispatch:
   push:
     paths-ignore:
       - "keymap-drawer/**"
+      - "vendor/VENDOR_LOCK.yml"
+      - "VENDOR.md"
 
 jobs:
+  matrix:
+    runs-on: ubuntu-22.04
+    name: Fetch Build Keyboards
+    outputs:
+      build_matrix: ${{ steps.matrix.outputs.build_matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch Build Matrix
+        id: matrix
+        run: |
+          build_matrix=$(yq -oj -I0 'build.yaml')
+          echo "build_matrix=${build_matrix}" >> "$GITHUB_OUTPUT"
+          yq -oj 'build.yaml'
+
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3.0
+    runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+    needs: matrix
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.matrix.outputs.build_matrix) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup vendored workspace
+        run: bash scripts/setup-vendor-workspace.sh
+
+      - name: Create build directory
+        run: echo "build_dir=$(mktemp -d)" >> $GITHUB_ENV
+
+      - name: Prepare variables
+        shell: sh -x {0}
+        env:
+          board: ${{ matrix.board }}
+          shield: ${{ matrix.shield }}
+          artifact_name: ${{ matrix.artifact-name }}
+          snippet: ${{ matrix.snippet }}
+        run: |
+          new_tmp_dir="${TMPDIR:-/tmp}/zmk-config"
+          mkdir -p "${new_tmp_dir}"
+          echo "base_dir=${new_tmp_dir}" >> $GITHUB_ENV
+
+          if [ -n "${snippet}" ]; then
+            extra_west_args="-S \"${snippet}\""
+          fi
+
+          vendor_modules="${GITHUB_WORKSPACE}/vendor/zmk-behavior-runtime-sensor-rotate"
+          vendor_modules="${vendor_modules};${GITHUB_WORKSPACE}/vendor/zmk-module-ble-management"
+          vendor_modules="${vendor_modules};${GITHUB_WORKSPACE}/vendor/zmk-module-battery-history"
+          vendor_modules="${vendor_modules};${GITHUB_WORKSPACE}/vendor/zmk-module-settings-rpc"
+          vendor_modules="${vendor_modules};${GITHUB_WORKSPACE}/vendor/zmk-module-runtime-input-processor"
+          zmk_extra_modules="${GITHUB_WORKSPACE};${vendor_modules}"
+
+          echo "zephyr_version=${ZEPHYR_VERSION}" >> $GITHUB_ENV
+          echo "extra_west_args=${extra_west_args}" >> $GITHUB_ENV
+          echo "extra_cmake_args=${shield:+-DSHIELD=\"$shield\"} -DZMK_EXTRA_MODULES='${zmk_extra_modules}'" >> $GITHUB_ENV
+          echo "display_name=${shield:+$shield - }${board}" >> $GITHUB_ENV
+          echo "artifact_name=${artifact_name:-${shield:+$shield-}${board}-zmk}" >> $GITHUB_ENV
+
+      - name: Copy config files to isolated temporary directory
+        run: |
+          mkdir -p "${{ env.base_dir }}/config"
+          cp -R config/* "${{ env.base_dir }}/config/"
+          rm -rf "${{ env.base_dir }}/zmk"
+          cp -a zmk "${{ env.base_dir }}/zmk"
+          rm -rf "${{ env.base_dir }}/modules"
+          cp -a modules "${{ env.base_dir }}/modules"
+
+      - name: Cache west modules
+        uses: actions/cache@v4
+        continue-on-error: true
+        env:
+          cache_name: cache-zephyr-${{ env.zephyr_version }}-modules
+        with:
+          path: |
+            ${{ env.base_dir }}/modules/
+            ${{ env.base_dir }}/tools/
+            ${{ env.base_dir }}/zephyr/
+            ${{ env.base_dir }}/bootloader/
+          key: ${{ runner.os }}-build-${{ env.cache_name }}-${{ hashFiles('vendor/**/west.yml', 'vendor/zmk/app/west.yml', 'build.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache_name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: West Init
+        working-directory: ${{ env.base_dir }}
+        run: west init -l config
+
+      - name: West Update
+        working-directory: ${{ env.base_dir }}
+        run: west update --fetch-opt=--filter=tree:0
+
+      - name: West Zephyr export
+        working-directory: ${{ env.base_dir }}
+        run: west zephyr-export
+
+      - name: West Build (${{ env.display_name }})
+        working-directory: ${{ env.base_dir }}
+        shell: sh -x {0}
+        run: west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" ${{ env.extra_west_args }} -- -DZMK_CONFIG=${{ env.base_dir }}/config ${{ env.extra_cmake_args }} ${{ matrix.cmake-args }}
+
+      - name: Rename artifacts
+        shell: sh -x {0}
+        run: |
+          mkdir "${{ env.build_dir }}/artifacts"
+          if [ -f "${{ env.build_dir }}/zephyr/zmk.uf2" ]; then
+            cp "${{ env.build_dir }}/zephyr/zmk.uf2" "${{ env.build_dir }}/artifacts/${{ env.artifact_name }}.uf2"
+          elif [ -f "${{ env.build_dir }}/zephyr/zmk.bin" ]; then
+            cp "${{ env.build_dir }}/zephyr/zmk.bin" "${{ env.build_dir }}/artifacts/${{ env.artifact_name }}.bin"
+          fi
+
+      - name: Archive (${{ env.display_name }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ env.artifact_name }}
+          path: ${{ env.build_dir }}/artifacts
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: build
+    name: Merge Output Artifacts
+    steps:
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: firmware
+          pattern: artifact-*
+          delete-merged: true
