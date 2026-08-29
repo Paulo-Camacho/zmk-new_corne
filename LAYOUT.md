@@ -21,11 +21,11 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 ```
 LEFT HAND                              (joystick unbound)       RIGHT HAND
 ┌────┬────┬────┬────┬────┬────┐                            ┌────┬────┬────┬────┬────┬────┐
-│Tab │ Q  │ W  │ E  │ R  │ T  │                            │ Y  │ U  │ I  │ O  │ P  │Bsp │
+│ `  │ Q  │ W  │ E  │ R  │ T  │                            │ Y  │ U  │ I  │ O  │ P  │Bsp │
 ├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
 │Cmd │ A  │ S  │ D  │ F  │ G  │                            │ H  │ J  │ K  │ L  │ ;  │ '  │
 ├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
-│Shft│ Z  │ X  │ C  │ V  │ B  │                            │ N  │ M  │ ,  │ .  │ /  │ `  │
+│Shft│ Z  │ X  │ C  │ V  │ B  │                            │ N  │ M  │ ,  │ .  │ /  │Tab │
 │    │    │    │    │    │Ret │                            │    │    │    │    │    │    │
 └────┴────┴────┴────┴────┴────┘                            └────┴────┴────┴────┴────┴────┘
      ┌────┐ ┌────┐ ┌────┐              ┌──────────┬──────────┬──────────┐
@@ -67,7 +67,7 @@ Also: mouse movement via joystick directions on this layer.
 Hold **right inner thumb**.
 
 ```
-TOP:    !  @  #  $  %  |  ^  &  *  (  )  Bsp
+TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
 HOME:   ·  -  =  [  ]  |  -  +  {  }  |  `
 BOT:    ·  _  +  {  }  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·

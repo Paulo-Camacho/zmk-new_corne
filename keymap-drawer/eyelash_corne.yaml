@@ -1,7 +1,7 @@
 layout: {zmk_keyboard: eyelash_corne}
 layers:
   BASE:
-  - $$mdi:keyboard-tab$$
+  - {t: '`', s: '~'}
   - Q
   - W
   - E
@@ -42,7 +42,7 @@ layers:
   - {t: ',', s: <}
   - {t: ., s: '>'}
   - {t: /, s: '?'}
-  - {t: '`', s: '~'}
+  - $$mdi:keyboard-tab$$
   - $$mdi:apple-keyboard-control$$
   - $$mdi:apple-keyboard-option$$
   - NUMBER
@@ -99,7 +99,7 @@ layers:
   - $$mdi:backspace-reverse-outline$$
   - {t: '$$mdi:transfer$$', type: trans}
   SYMBOL:
-  - {t: '$$mdi:transfer$$', type: trans}
+  - '~'
   - '!'
   - '@'
   - '#'
