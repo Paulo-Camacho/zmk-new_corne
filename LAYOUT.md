@@ -133,8 +133,8 @@ Combos work on **BASE layer only** unless noted.
 | Left pinky (`A` row) | Command (⌘) | — |
 | Bottom-left (`Z` row) | Shift | — |
 | Bottom-right (`/` row) | Shift | — |
-| Left thumbs | Ctrl · Option · NUMBER layer | Hold for layer |
-| Right inner thumb | — | **SYMBOL** layer |
+| Left thumbs | Ctrl · Option · **SYMBOL** layer | Hold for layer |
+| Right inner thumb | — | **NUMBER** layer |
 | Right middle thumb | **Space** | — |
 | Right outer thumb | Alt | **Fn** layer |
 
@@ -143,9 +143,9 @@ Combos work on **BASE layer only** unless noted.
 ## Tips for programmers
 
 1. **Escape** — use `J+K` combo.
-2. **Backtick / tilde** — hold **NUMBER** layer, key left of `1`: `` ` `` (Shift → `~`). **SYMBOL** same spot: `~`. Or `,+.` combo on BASE.
-3. **Brackets** — hold right thumb for SYMBOL, then `F`/`G` for `[` `]`, or `K`/`L` for `{` `}` (`H`/`J` for `_`/`+`).
-4. **Arrows** — on **NUMBER** layer home row.
+2. **Backtick / tilde** — hold **NUMBER** layer (right inner thumb), key left of `1`: `` ` `` (Shift → `~`). **SYMBOL** (left inner thumb) same spot: `~`. Or `,+.` combo on BASE.
+3. **Brackets** — hold **left** thumb for SYMBOL, then `F`/`G` for `[` `]`, or `K`/`L` for `{` `}` (`H`/`J` for `_`/`+`).
+4. **Arrows** — hold **right** inner thumb for NUMBER layer home row.
 5. **Enter** — `D+F` combo on the left home row, or thumb Enter below `B`.
 6. **Space** — right middle thumb.
 
