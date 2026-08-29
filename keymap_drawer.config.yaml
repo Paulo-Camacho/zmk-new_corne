@@ -531,8 +531,6 @@ parse_config:
       align: top
     op_del:
       align: top
-    nm_ret:
-      align: bottom
     scq_bksp:
       align: top
       offset: 0.08

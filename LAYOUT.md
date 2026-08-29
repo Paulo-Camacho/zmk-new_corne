@@ -101,7 +101,6 @@ Combos work on **BASE layer only** unless noted.
 | **df_ret** | `D` + `F` | Enter | Extra enter on home row |
 | **ui_bksp** | `U` + `I` | Backspace | Delete without reaching |
 | **op_del** | `O` + `P` | Delete | Forward delete |
-| **nm_ret** | `N` + `M` | Enter | Extra enter on bottom row |
 | **scq_bksp** | `;` + `'` | Backspace | Alternate delete |
 | **cd_grave** | `,` + `.` | `` ` `` | Backtick (shell, templates) |
 | **softoff** | `Q` + `S` + `Z` (hold 2s) | Deep sleep | Wake via reset button |
@@ -148,9 +147,8 @@ Combos work on **BASE layer only** unless noted.
 1. **Escape** — use `J+K` combo; corner key is `` ` `` (backtick) instead.
 2. **Brackets** — hold right thumb for SYMBOL, then `F`/`G` for `[` `]`, or `K`/`L` for `{` `}` (`H`/`J` for `-`/`+`).
 3. **Arrows** — joystick on BASE; also available on NUMBER layer.
-4. **Enter** — `D+F` combo on the left home row (also `N+M` on bottom row, thumb Enter below `B`).
-5. **Enter** — inner key below `B`, or `N+M` combo.
-6. **Space** — joystick press (center), or `N+M` combo for enter alternative.
+4. **Enter** — `D+F` combo on the left home row, or thumb Enter below `B`.
+5. **Space** — right middle thumb.
 
 ---
 

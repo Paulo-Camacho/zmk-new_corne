@@ -214,10 +214,6 @@ combos:
   k: $$mdi:backspace-reverse-outline$$
   l: [BASE]
   a: top
-- p: [36, 37]
-  k: {t: '$$mdi:keyboard-return$$', type: enter}
-  l: [BASE]
-  a: bottom
 - p: [26, 27]
   k: {t: '$$mdi:backspace$$', type: backspace}
   l: [BASE]
