@@ -25,7 +25,7 @@ LEFT HAND                              (joystick unbound)       RIGHT HAND
 ├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
 │Cmd │ A  │ S  │ D  │ F  │ G  │                            │ H  │ J  │ K  │ L  │ ;  │ '  │
 ├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
-│Shft│ Z  │ X  │ C  │ V  │ B  │                            │ N  │ M  │ ,  │ .  │ /  │Tab │
+│Shft│ Z  │ X  │ C  │ V  │ B  │                            │ N  │ M  │ ,  │ .  │ /  │Shft│
 │    │    │    │    │    │Ret │                            │    │    │    │    │    │    │
 └────┴────┴────┴────┴────┴────┘                            └────┴────┴────┴────┴────┴────┘
      ┌────┐ ┌────┐ ┌────┐              ┌──────────┬──────────┬──────────┐
@@ -133,6 +133,7 @@ Combos work on **BASE layer only** unless noted.
 |-----|-----|------|
 | Left pinky (`A` row) | Command (⌘) | — |
 | Bottom-left (`Z` row) | Shift | — |
+| Bottom-right (`/` row) | Shift | — |
 | Left thumbs | Ctrl · Option · NUMBER layer | Hold for layer |
 | Right inner thumb | — | **SYMBOL** layer |
 | Right middle thumb | **Space** | — |
