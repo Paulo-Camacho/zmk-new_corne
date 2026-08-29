@@ -103,7 +103,7 @@
             display-name = "SYMBOL";
             bindings = <
 &kp TILDE  &kp EXCL   &kp AT    &kp HASH  &kp DLLR  &kp PRCNT                            &none                            &kp CARET  &kp AMPS  &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
-&trans  &trans     &kp MINUS &kp EQUAL &kp LBKT  &kp RBKT             &none           &none           &none            &kp MINUS  &kp PLUS   &kp LBRC   &kp RBRC  &kp PIPE  &kp GRAVE
+&trans  &trans     &kp MINUS &kp EQUAL &kp LBKT  &kp RBKT             &none           &none           &none            &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp PIPE  &kp GRAVE
 &trans  &trans     &kp UNDER &kp PLUS  &kp LBRC  &kp RBRC  &trans                    &none                            &kp TILDE  &kp FSLH  &kp SEMI   &kp COLON &kp DELETE  &trans
                                     &trans    &trans    &trans                                                             &kp RET    &trans    &trans
             >;
