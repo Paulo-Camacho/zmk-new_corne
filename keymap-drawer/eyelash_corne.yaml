@@ -125,7 +125,7 @@ layers:
   - '}'
   - '|'
   - {t: '`', s: '~'}
-  - DQUOT
+  - '"'
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
   - {t: '$$mdi:transfer$$', type: trans}
