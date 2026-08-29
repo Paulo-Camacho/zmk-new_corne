@@ -10,8 +10,8 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 | Layer | Name | How to activate | Purpose |
 |-------|------|-----------------|---------|
 | 0 | **BASE** | Default | QWERTY typing + combos |
-| 1 | **NUMBER** | Hold left inner thumb (`mo 1`) | Numbers, arrows, Bluetooth, RGB |
-| 2 | **SYMBOL** | Hold right inner thumb | Code symbols `[]{}()` etc. |
+| 1 | **NUMBER** | Hold right inner thumb (`mo 1`) | Numbers, arrows |
+| 2 | **SYMBOL** | Hold left inner thumb (`mo 2`) | Code symbols `[]{}()` etc. |
 | 3 | **Fn** | Hold right outer thumb | F-keys, reset, Studio unlock |
 
 ---
@@ -29,7 +29,7 @@ LEFT HAND                              (joystick unbound)       RIGHT HAND
 │    │    │    │    │    │Ret │                            │    │    │    │    │    │    │
 └────┴────┴────┴────┴────┴────┘                            └────┴────┴────┴────┴────┴────┘
      ┌────┐ ┌────┐ ┌────┐              ┌──────────┬──────────┬──────────┐
-     │Ctrl│ │Opt │ │Num │              │   Sym    │  Space   │ Alt / Fn │
+     │Ctrl│ │Opt │ │Sym │              │   Num    │  Space   │ Alt / Fn │
      └────┘ └────┘ └────┘              └──────────┴──────────┴──────────┘
 ```
 
@@ -47,7 +47,7 @@ All 5-way joystick keys are unbound (`&none`). Use thumb **Space**, **Enter** (b
 
 ## Layer 1 — NUMBER
 
-Hold **left inner thumb** (between Gui and Space).
+Hold **right inner thumb**.
 
 ```
 TOP:    `  1  2  3  4  5  |  6  7  8  9  0  Bsp
