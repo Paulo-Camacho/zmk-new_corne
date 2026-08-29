@@ -527,13 +527,8 @@ parse_config:
       offset: 0.05
     df_ret:
       align: bottom
-    ui_bksp:
-      align: top
     op_del:
       align: top
-    scq_bksp:
-      align: top
-      offset: 0.08
     cd_grave:
       align: bottom
       offset: 0.1

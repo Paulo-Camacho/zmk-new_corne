@@ -206,19 +206,10 @@ combos:
   k: {t: '$$mdi:keyboard-return$$', type: enter}
   l: [BASE]
   a: bottom
-- p: [8, 9]
-  k: {t: '$$mdi:backspace$$', type: backspace}
-  l: [BASE]
-  a: top
 - p: [10, 11]
   k: $$mdi:backspace-reverse-outline$$
   l: [BASE]
   a: top
-- p: [26, 27]
-  k: {t: '$$mdi:backspace$$', type: backspace}
-  l: [BASE]
-  a: top
-  o: 0.08
 - p: [38, 39]
   k: {t: '`', s: '~'}
   l: [BASE, SYMBOL]

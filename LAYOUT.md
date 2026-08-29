@@ -99,9 +99,7 @@ Combos work on **BASE layer only** unless noted.
 |-------|------|--------|-------|
 | **jk_esc** | `J` + `K` | Escape | Vim / IDE quit dialogs |
 | **df_ret** | `D` + `F` | Enter | Extra enter on home row |
-| **ui_bksp** | `U` + `I` | Backspace | Delete without reaching |
 | **op_del** | `O` + `P` | Delete | Forward delete |
-| **scq_bksp** | `;` + `'` | Backspace | Alternate delete |
 | **cd_grave** | `,` + `.` | `` ` `` | Backtick (shell, templates) |
 | **softoff** | `Q` + `S` + `Z` (hold 2s) | Deep sleep | Wake via reset button |
 
