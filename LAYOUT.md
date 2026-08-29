@@ -62,7 +62,7 @@ Also: mouse movement via joystick directions on this layer.
 
 ## Layer 2 — SYMBOL
 
-Hold **right inner thumb**.
+Hold **left inner thumb**.
 
 ```
 TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
@@ -81,9 +81,9 @@ Hold **right outer thumb** (tap Alt, hold for Fn).
 
 ```
 TOP:    Studio F1 F2 F3 F4 F5  |  F6  F7  F8  F9  F10 F11
-HOME:   ·  BT BT BT BT BT RGBoff |  RGBon RGBeff RGBefr RGBspi RGBbri RGBbrd
-        clr 0  1  2  3
-BOT:    ·  mouse ·  ·  ·  Mute |  ·  ·  boot reset Scroll Pause
+HOME:   BT  BT BT BT BT · |  RGBon RGBeff RGBefr RGBspi RGBbri RGBbrd
+        clr 0  1  2  3   (A S D F G)
+BOT:    RGBoff reset mouse ·  ·  Mute |  ·  ·  boot reset Scroll Pause
 THUMBS: ·  ·  ·                |  ·  ·  ·
 ```
 
