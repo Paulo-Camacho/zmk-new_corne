@@ -5,5 +5,9 @@ manifest:
       url: __VENDOR_ZMK_URL__
       revision: vendor
       import: app/west.yml
+    - name: zmk-studio-messages
+      path: modules/msgs/zmk-studio-messages
+      url: __VENDOR_STUDIO_MSGS_URL__
+      revision: vendor
   self:
     path: config

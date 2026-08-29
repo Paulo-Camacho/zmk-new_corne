@@ -28,7 +28,10 @@ cp -a "$ROOT/vendor/zmk-studio-messages" "$ROOT/modules/msgs/zmk-studio-messages
 init_vendor_git_repo "$ROOT/modules/msgs/zmk-studio-messages" vendor
 
 ZMK_FILE_URL="file://${ROOT}/zmk"
-sed "s|__VENDOR_ZMK_URL__|${ZMK_FILE_URL}|g" "$ROOT/config/west.yml" > "$ROOT/config/west.resolved.yml"
+STUDIO_MSGS_URL="file://${ROOT}/modules/msgs/zmk-studio-messages"
+sed -e "s|__VENDOR_ZMK_URL__|${ZMK_FILE_URL}|g" \
+    -e "s|__VENDOR_STUDIO_MSGS_URL__|${STUDIO_MSGS_URL}|g" \
+    "$ROOT/config/west.yml" > "$ROOT/config/west.resolved.yml"
 mv "$ROOT/config/west.resolved.yml" "$ROOT/config/west.yml"
 
 echo "Vendor workspace ready."
