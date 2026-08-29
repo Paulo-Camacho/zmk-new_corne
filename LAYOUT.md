@@ -21,7 +21,7 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 ```
 LEFT HAND                              (joystick unbound)       RIGHT HAND
 ┌────┬────┬────┬────┬────┬────┐                            ┌────┬────┬────┬────┬────┬────┐
-│ `  │ Q  │ W  │ E  │ R  │ T  │                            │ Y  │ U  │ I  │ O  │ P  │Bsp │
+│Tab │ Q  │ W  │ E  │ R  │ T  │                            │ Y  │ U  │ I  │ O  │ P  │Bsp │
 ├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
 │Cmd │ A  │ S  │ D  │ F  │ G  │                            │ H  │ J  │ K  │ L  │ ;  │ '  │
 ├────┼────┼────┼────┼────┼────┤                            ├────┼────┼────┼────┼────┼────┤
@@ -50,7 +50,7 @@ All 5-way joystick keys are unbound (`&none`). Use thumb **Space**, **Enter** (b
 Hold **left inner thumb** (between Gui and Space).
 
 ```
-TOP:    1  2  3  4  5  |  6  7  8  9  0  Bsp
+TOP:    1  2  3  4  5  |  6  7  8  `  ~  Bsp
 HOME:   BT BT BT BT BT  |  ←  ↓  ↑  →  Home PgUp
         clr 0  1  2  3
 BOT:    RGB RGB ·  ·  RGB |  RGB RGB RGB RGB End PgDn
@@ -67,7 +67,7 @@ Also: mouse movement via joystick directions on this layer.
 Hold **right inner thumb**.
 
 ```
-TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
+TOP:    !  @  #  $  %  |  ^  &  *  (  )  Bsp
 HOME:   ·  -  =  [  ]  |  -  +  {  }  |  `
 BOT:    ·  _  +  {  }  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
@@ -143,11 +143,12 @@ Combos work on **BASE layer only** unless noted.
 
 ## Tips for programmers
 
-1. **Escape** — use `J+K` combo; corner key is `` ` `` (backtick) instead.
-2. **Brackets** — hold right thumb for SYMBOL, then `F`/`G` for `[` `]`, or `K`/`L` for `{` `}` (`H`/`J` for `-`/`+`).
-3. **Arrows** — joystick on BASE; also available on NUMBER layer.
-4. **Enter** — `D+F` combo on the left home row, or thumb Enter below `B`.
-5. **Space** — right middle thumb.
+1. **Escape** — use `J+K` combo.
+2. **Backtick / tilde** — hold **NUMBER** layer, top-right: `` ` `` and `~` (or `,+.` combo on BASE).
+3. **Brackets** — hold right thumb for SYMBOL, then `F`/`G` for `[` `]`, or `K`/`L` for `{` `}` (`H`/`J` for `-`/`+`).
+4. **Arrows** — on **NUMBER** layer home row.
+5. **Enter** — `D+F` combo on the left home row, or thumb Enter below `B`.
+6. **Space** — right middle thumb.
 
 ---
 
