@@ -29,7 +29,7 @@ LEFT HAND                              (joystick unbound)       RIGHT HAND
 │    │    │    │    │    │Ret │                            │    │    │    │    │    │    │
 └────┴────┴────┴────┴────┴────┘                            └────┴────┴────┴────┴────┴────┘
      ┌────┐ ┌────┐ ┌────┐              ┌──────────┬──────────┬──────────┐
-     │Ctrl│ │Opt │ │Sym │              │   Num    │  Space   │ Alt / Fn │
+     │Ctrl│ │Opt │ │Sym │              │   Num    │  Space   │   Fn   │
      └────┘ └────┘ └────┘              └──────────┴──────────┴──────────┘
 ```
 
@@ -51,8 +51,8 @@ Hold **right inner thumb**.
 
 ```
 TOP:    `  1  2  3  4  5  |  6  7  8  9  0  Bsp
-HOME:   ·  ·  ·  ·  ·  |  ←  ↓  ↑  →  Home PgUp
-BOT:    ·  ·  ·  ·  ·  |  ·  ·  ·  ·  End PgDn
+HOME:   [  ]  {  }  ·  |  ←  ↓  ↑  →  Home PgUp
+BOT:    ·  ·  (  )  ·  Mute |  ·  ·  ·  ·  End PgDn
 THUMBS: ·  ·  ·           |  Ins Del ·
 ```
 
@@ -77,7 +77,7 @@ Optimized for programming: brackets and operators on the home row.
 
 ## Layer 3 — Fn
 
-Hold **right outer thumb** (tap Alt, hold for Fn).
+Hold **right outer thumb** (Fn only — no Alt tap).
 
 ```
 TOP:    Studio F1 F2 F3 F4 F5  |  F6  F7  F8  F9  F10 F11
@@ -136,7 +136,7 @@ Combos work on **BASE layer only** unless noted.
 | Left thumbs | Ctrl · Option · **SYMBOL** layer | Hold for layer |
 | Right inner thumb | — | **NUMBER** layer |
 | Right middle thumb | **Space** | — |
-| Right outer thumb | Alt | **Fn** layer |
+| Right outer thumb | — | **Fn** layer (hold only) |
 
 ---
 
