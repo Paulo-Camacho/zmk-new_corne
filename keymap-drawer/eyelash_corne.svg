@@ -530,11 +530,11 @@ rect.held, rect.combo.held {
 <rect rx="6" ry="6" x="742" y="110" width="28" height="26" class="combo"/>
 <use href="#mdi:keyboard-esc" xlink:href="#mdi:keyboard-esc" x="747" y="114" height="18" width="18.0" class="combo tap glyph mdi:keyboard-esc"/>
 </g>
-<g class="combo combopos-1">
+<g class="combo enter combopos-1">
 <path d="M224,120 h-22 a6.0,6.0 0 0 1 -6.0,-6.0 v-11" class="combo"/>
 <path d="M224,120 h22 a6.0,6.0 0 0 0 6.0,-6.0 v-4" class="combo"/>
-<rect rx="6" ry="6" x="210" y="107" width="28" height="26" class="combo"/>
-<use href="#mdi:keyboard-tab" xlink:href="#mdi:keyboard-tab" x="215" y="111" height="18" width="18.0" class="combo tap glyph mdi:keyboard-tab"/>
+<rect rx="6" ry="6" x="210" y="107" width="28" height="26" class="combo enter"/>
+<use href="#mdi:keyboard-return" xlink:href="#mdi:keyboard-return" x="215" y="111" height="18" width="18.0" class="combo enter tap glyph mdi:keyboard-return"/>
 </g>
 <g class="combo backspace combopos-2">
 <path d="M756,-1 h-22 a6.0,6.0 0 0 0 -6.0,6.0 v11" class="combo"/>

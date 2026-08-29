@@ -203,7 +203,7 @@ combos:
   a: bottom
   o: 0.05
 - p: [16, 17]
-  k: $$mdi:keyboard-tab$$
+  k: {t: '$$mdi:keyboard-return$$', type: enter}
   l: [BASE]
   a: bottom
 - p: [8, 9]

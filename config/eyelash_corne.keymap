@@ -41,8 +41,8 @@
             require-prior-idle-ms = <150>;
         };
 
-        df_tab {
-            bindings = <&kp TAB>;
+        df_ret {
+            bindings = <&kp RET>;
             key-positions = <16 17>;
             layers = <0>;
             timeout-ms = <50>;
