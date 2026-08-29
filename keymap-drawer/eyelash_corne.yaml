@@ -50,7 +50,7 @@ layers:
   - $$mdi:keyboard-space$$
   - {t: '$$mdi:apple-keyboard-option$$', h: Fn}
   NUMBER:
-  - {t: '$$mdi:transfer$$', type: trans}
+  - {t: '`', s: '~'}
   - {t: '1', s: '!'}
   - {t: '2', s: '@'}
   - {t: '3', s: '#'}
@@ -60,8 +60,8 @@ layers:
   - {t: '6', s: ^}
   - {t: '7', s: '&'}
   - {t: '8', s: '*'}
-  - {t: '`', s: '~'}
-  - '~'
+  - {t: '9', s: (}
+  - {t: '0', s: )}
   - {t: '$$mdi:backspace$$', type: backspace}
   - {t: '$$mdi:transfer$$', type: trans}
   - BT CLR ALL

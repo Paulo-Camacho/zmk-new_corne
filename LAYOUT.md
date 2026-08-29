@@ -50,7 +50,7 @@ All 5-way joystick keys are unbound (`&none`). Use thumb **Space**, **Enter** (b
 Hold **left inner thumb** (between Gui and Space).
 
 ```
-TOP:    1  2  3  4  5  |  6  7  8  `  ~  Bsp
+TOP:    `  1  2  3  4  5  |  6  7  8  9  0  Bsp
 HOME:   BT BT BT BT BT  |  ←  ↓  ↑  →  Home PgUp
         clr 0  1  2  3
 BOT:    RGB RGB ·  ·  RGB |  RGB RGB RGB RGB End PgDn
@@ -67,7 +67,7 @@ Also: mouse movement via joystick directions on this layer.
 Hold **right inner thumb**.
 
 ```
-TOP:    !  @  #  $  %  |  ^  &  *  (  )  Bsp
+TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
 HOME:   ·  -  =  [  ]  |  -  +  {  }  |  `
 BOT:    ·  _  +  {  }  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
