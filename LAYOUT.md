@@ -12,7 +12,7 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 | 0 | **BASE** | Default | QWERTY typing + combos |
 | 1 | **NUMBER** | Hold right inner thumb (`mo 1`) | Numbers, arrows |
 | 2 | **SYMBOL** | Hold left inner thumb (`mo 2`) | Code symbols `[]{}()` etc. |
-| 3 | **Fn** | Hold right outer thumb | F-keys, reset, Studio unlock |
+| 3 | **Fn** | Hold right outer thumb (`mo 3`) | F-keys, BT, RGB, reset |
 
 ---
 

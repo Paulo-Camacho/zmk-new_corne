@@ -48,7 +48,7 @@ layers:
   - SYMBOL
   - NUMBER
   - $$mdi:keyboard-space$$
-  - {t: '$$mdi:apple-keyboard-option$$', h: Fn}
+  - Fn
   NUMBER:
   - {t: '`', s: '~'}
   - {t: '1', s: '!'}
