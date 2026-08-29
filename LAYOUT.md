@@ -68,7 +68,7 @@ Hold **right inner thumb**.
 
 ```
 TOP:    !  @  #  $  %  |  ^  &  *  (  )  Bsp
-HOME:   ·  -  =  [  ]  |  {  }  |  `  "
+HOME:   ·  -  =  [  ]  |  -  +  {  }  |  `
 BOT:    ·  _  +  {  }  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
 ```
@@ -146,7 +146,7 @@ Combos work on **BASE layer only** unless noted.
 ## Tips for programmers
 
 1. **Escape** — use `J+K` combo; corner key is `` ` `` (backtick) instead.
-2. **Brackets** — hold right thumb for SYMBOL, then `F`/`G` for `[` `]`, or `H`/`J` for `{` `}`.
+2. **Brackets** — hold right thumb for SYMBOL, then `F`/`G` for `[` `]`, or `K`/`L` for `{` `}` (`H`/`J` for `-`/`+`).
 3. **Arrows** — joystick on BASE; also available on NUMBER layer.
 4. **Tab** — `D+F` combo without moving to thumb keys.
 5. **Enter** — inner key below `B`, or `N+M` combo.
