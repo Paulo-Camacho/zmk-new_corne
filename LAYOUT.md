@@ -67,12 +67,12 @@ Hold **left inner thumb**.
 
 ```
 TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
-HOME:   ·  -  =  ·  ·  |  _  +  {  }  |  `
+HOME:   ·  (  )  {  }  ·  |  ←  ↓  ↑  →  ·  ·
 BOT:    ·  ·  [  ]  ·  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
 ```
 
-Optimized for programming: `[` `]` on **C** / **V**, braces on home row right.
+Hold **left inner thumb** for symbols and Vim-style arrows on **H J K L**.
 
 ---
 
