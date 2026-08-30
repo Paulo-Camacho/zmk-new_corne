@@ -51,13 +51,12 @@ Hold **right inner thumb**.
 
 ```
 TOP:    `  1  2  3  4  5  |  6  7  8  9  0  Bsp
-HOME:   \  (  )  -  =  ·  |  ←  ↓  ↑  →  Home PgUp
-        ·  A  S  D  F        H  J  K  L  ;  '
+HOME:   \  -  =  (  )  ·  |  ←  ↓  ↑  →  Home PgUp
 BOT:    ·  ·  [  ]  ·  Mute |  ·  ·  ·  ·  End PgDn
 THUMBS: ·  ·  ·           |  Ins Del ·
 ```
 
-Shift+D → `_`, shift+F → `+`. Pinky left of **A** is `\` (shift → `|`).
+Shift+A → `_`, shift+S → `+`. Pinky left of **A** is `\` (shift → `|`).
 
 ---
 
@@ -67,12 +66,10 @@ Hold **left inner thumb**.
 
 ```
 TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
-HOME:   ·  (  )  {  }  ·  |  ←  ↓  ↑  →  ·  ·
+HOME:   ·  -  +  {  }  ·  |  ←  ↓  ↑  →  ·  ·
 BOT:    ·  ·  ·  [  ]  ·  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
 ```
-
-Hold **left inner thumb** for symbols and Vim-style arrows on **H J K L**.
 
 ---
 
@@ -84,9 +81,11 @@ Hold **right outer thumb** (Fn only — no Alt tap).
 TOP:    Studio F1 F2 F3 F4 F5  |  F6  F7  F8  F9  F10 F11
 HOME:   ·  BT BT BT BT BT |  RGBon RGBeff RGBefr RGBspi RGBbri RGBbrd
            clr 0  1  2  3   (S D F G)
-BOT:    RGBoff reset mouse ·  ·  Mute |  ·  ·  boot reset Scroll Pause
+BOT:    RGBoff reset mouse ·  ·  Mute |  Vol- Vol+ Mute Bri- Bri+ Play
 THUMBS: ·  ·  ·                |  ·  ·  ·
 ```
+
+Bottom-right **N M , . / Shift**: volume, mute, brightness, play/pause.
 
 ---
 
