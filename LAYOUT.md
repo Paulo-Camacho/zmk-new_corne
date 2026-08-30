@@ -98,14 +98,17 @@ Combos work on **BASE layer only** unless noted.
 |-------|------|--------|-------|
 | **jk_esc** | `J` + `K` | Escape | Vim / IDE quit dialogs |
 | **df_ret** | `D` + `F` | Enter | Extra enter on home row |
-| **cd_grave** | `,` + `.` | `` ` `` | Backtick (shell, templates) |
+| **cd_grave** | `,` + `.` | `` ` `` | BASE + SYMBOL layers |
 | **softoff** | `Q` + `S` + `Z` (hold 2s) | Deep sleep | Wake via reset button |
+
+On **NUMBER** layer, **A** is `-` (Shift → `_`); **S** is `=` (Shift → `+`).
 
 ### Combo key positions (for editing keymap)
 
 | Key | Position |
 |-----|----------|
 | Q | 1 |
+| A | 14 |
 | U | 8 |
 | I | 9 |
 | O | 10 |
