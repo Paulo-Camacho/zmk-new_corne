@@ -53,7 +53,7 @@ Hold **right inner thumb**.
 TOP:    `  1  2  3  4  5  |  6  7  8  9  0  Bsp
 HOME:   \  -  =  (  )  ·  |  ←  ↓  ↑  →  Home PgUp
 BOT:    ·  ·  [  ]  ·  Mute |  ·  ·  ·  ·  End PgDn
-THUMBS: ·  ·  ·           |  Ins Del ·
+THUMBS: ·  ·  ·           |  Num Del ·
 ```
 
 Shift+A → `_`, shift+S → `+`. Pinky left of **A** is `\` (shift → `|`).

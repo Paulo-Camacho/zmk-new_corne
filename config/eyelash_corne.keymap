@@ -85,7 +85,7 @@
 &kp GRAVE       &kp N1           &kp N2          &kp N3        &kp N4        &kp N5                                         &none                            &kp N6           &kp N7           &kp N8           &kp N9           &kp N0    &kp BSPC
 &kp BSLH        &kp MINUS       &kp EQUAL       &kp LPAR      &kp RPAR      &trans                   &none           &none           &none            &kp LEFT         &kp DOWN         &kp UP           &kp RIGHT        &kp HOME  &kp PG_UP
 &trans  &trans           &kp LBKT        &kp RBKT      &trans        &trans  &kp C_MUTE                    &none                            &trans           &trans           &trans           &trans           &kp END   &kp PG_DN
-                                         &trans        &trans        &trans                                                                          &kp INS          &kp DEL          &trans
+                                         &trans        &trans        &trans                                                                          &trans          &kp DEL          &trans
             >;
 
             sensor-bindings = <&rsr_vol &rsr_trans>;
