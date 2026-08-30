@@ -12,7 +12,7 @@ Visual diagram: [`keymap-drawer/eyelash_corne.svg`](keymap-drawer/eyelash_corne.
 | 0 | **BASE** | Default | QWERTY typing + combos |
 | 1 | **NUMBER** | Hold right inner thumb (`mo 1`) | Numbers, arrows |
 | 2 | **SYMBOL** | Hold left inner thumb (`mo 2`) | Code symbols `[]{}()` etc. |
-| 3 | **Fn** | Hold right outer thumb (`mo 3`) | F-keys, RGB, reset |
+| 3 | **Fn** | Hold right outer thumb (`mo 3`) | F-keys, BT, RGB, reset |
 
 ---
 
@@ -51,10 +51,9 @@ Hold **right inner thumb**.
 
 ```
 TOP:    `  1  2  3  4  5  |  6  7  8  9  0  Bsp
-HOME:   (  )  {  }  ·  |  BT BT BT BT BT ·
-        A  S  D  F        clr 0  1  2  3  (H J K L ;)
+HOME:   (  )  {  }  ·  |  ←  ↓  ↑  →  Home PgUp
+        A  S  D  F        H  J  K  L  ;  '
 BOT:    ·  ·  [  ]  ·  Mute |  ·  ·  ·  ·  End PgDn
-        Z  X  C  V
 THUMBS: ·  ·  ·           |  Ins Del ·
 ```
 
@@ -83,7 +82,8 @@ Hold **right outer thumb** (Fn only — no Alt tap).
 
 ```
 TOP:    Studio F1 F2 F3 F4 F5  |  F6  F7  F8  F9  F10 F11
-HOME:   ·  ·  ·  ·  ·  · |  RGBon RGBeff RGBefr RGBspi RGBbri RGBbrd
+HOME:   BT  BT BT BT BT · |  RGBon RGBeff RGBefr RGBspi RGBbri RGBbrd
+        clr 0  1  2  3   (A S D F G)
 BOT:    RGBoff reset mouse ·  ·  Mute |  ·  ·  boot reset Scroll Pause
 THUMBS: ·  ·  ·                |  ·  ·  ·
 ```
