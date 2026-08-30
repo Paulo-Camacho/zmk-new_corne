@@ -1,0 +1,19 @@
+# Copyright (c) 2026 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+description: |
+  Behavior to keep temp-layer layer active while a key is held.
+  When this behavior is pressed, it prevents the temp-layer layer from
+  automatically deactivating. This is useful for keeping the mouse layer
+  active while performing complex mouse operations.
+
+compatible: "zmk,behavior-input-processor-temp-layer-keep-active"
+
+include: zero_param.yaml
+
+
+properties:
+  processor-name:
+    type: string
+    required: true
+    description: Name of the runtime input processor with temp-layer enabled

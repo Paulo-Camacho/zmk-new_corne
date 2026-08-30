@@ -1,0 +1,40 @@
+# Frozen vendor snapshots — autonomous build sources
+# Archived on 2026-08-28 from the revisions below.
+# Builds no longer fetch these projects from GitHub at compile time.
+
+projects:
+  - name: zmk
+    original_url: https://github.com/cormoran/zmk
+    original_revision: v0.3-branch+dya
+  - name: zmk-behavior-runtime-sensor-rotate
+    original_url: https://github.com/cormoran/zmk-behavior-runtime-sensor-rotate
+    original_revision: main
+  - name: zmk-module-ble-management
+    original_url: https://github.com/cormoran/zmk-module-ble-management
+    original_revision: zmk-v0.3.0.0
+  - name: zmk-module-battery-history
+    original_url: https://github.com/cormoran/zmk-module-battery-history
+    original_revision: main
+  - name: zmk-module-settings-rpc
+    original_url: https://github.com/cormoran/zmk-module-settings-rpc
+    original_revision: main
+  - name: zmk-module-runtime-input-processor
+    original_url: https://github.com/cormoran/zmk-module-runtime-input-processor
+    original_revision: zmk-v0.3.0.0
+  - name: zmk-studio-messages
+    original_url: https://github.com/cormoran/zmk-studio-messages
+    original_revision: custom-studio-protocol
+
+pinned_commits:
+  zmk: 4493783ef88ce2e653bf8217c92ee17140df71e3
+  zmk-behavior-runtime-sensor-rotate: 8b1125ed676c1f5e14145d217984f33d0ebdcef4
+  zmk-module-ble-management: 851661cd21f2aded8ec649da86e01a207dc4b973
+  zmk-module-battery-history: 307755dd2ad4d320e14de162e8e5ef018f29d929
+  zmk-module-settings-rpc: 78f86df9e6c5edaf57bef3ccbd7f360cfdf49291
+  zmk-module-runtime-input-processor: dbf92f764de8b6ffd60bf5850514302875fe2570
+  zmk-studio-messages: aecf327e5c7b51b678fd1a38ec0819818a39859b
+
+notes:
+  - Board shield definitions live in this repo under boards/shields/eyelash_corne/.
+  - The former eyelash_corne west project (a741725193/zmk-new_corne) is no longer fetched.
+  - Zephyr and nanopb still download from zmkfirmware on first build (official upstream, not vendor).

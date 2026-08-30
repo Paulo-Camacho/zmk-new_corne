@@ -15,13 +15,6 @@
 
 / {
     behaviors {
-        td0: td0 {
-            compatible = "zmk,behavior-tap-dance";
-            display-name = "Shift/Caps Lock Tap Dance";
-            #binding-cells = <0>;
-            bindings = <&kp LEFT_SHIFT>, <&kp CAPS>;
-        };
-
         rsr_vol: rsr_vol {
             compatible = "zmk,behavior-runtime-sensor-rotate";
             #sensor-binding-cells = <0>;
@@ -37,8 +30,32 @@
         };
     };
 
-   combos {
+    combos {
         compatible = "zmk,combos";
+
+        jk_esc {
+            bindings = <&kp ESCAPE>;
+            key-positions = <23 24>;
+            layers = <0>;
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+        };
+
+        df_ret {
+            bindings = <&kp RET>;
+            key-positions = <16 17>;
+            layers = <0>;
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+        };
+
+        cd_grave {
+            bindings = <&kp GRAVE>;
+            key-positions = <38 39>;
+            layers = <0 2>;
+            timeout-ms = <50>;
+            require-prior-idle-ms = <150>;
+        };
 
         softoff {
             bindings = <&soft_off>;
@@ -50,12 +67,13 @@
         compatible = "zmk,keymap";
 
         default_layer {
-            display-name = "QWERTY";
+            /* Programmer Mac layout — see LAYOUT.md */
+            display-name = "BASE";
             bindings = <
-&kp TAB    &kp Q  &kp W  &kp E     &kp R  &kp T                               &kp UP                &kp Y        &kp U  &kp I      &kp O    &kp P     &kp BSPC
-&td0       &kp A  &kp S  &kp D     &kp F  &kp G                     &kp LEFT  &kp ENTER  &kp RIGHT  &kp H        &kp J  &kp K      &kp L    &kp SEMI  &kp SQT
-&kp LCTRL  &kp Z  &kp X  &kp C     &kp V  &kp B        &kp SPACE              &kp DOWN              &kp N        &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp ESC
-                         &kp LGUI  &mo 1  &lt 3 SPACE                                               &lt 3 ENTER  &mo 2  &kp RALT
+&kp TAB         &kp Q  &kp W  &kp E     &kp R  &kp T                               &none               &kp Y        &kp U  &kp I      &kp O    &kp P     &kp BSPC
+&kp LGUI        &kp A  &kp S  &kp D     &kp F  &kp G                     &none   &none      &none   &kp H        &kp J  &kp K      &kp L    &kp SEMI  &kp SQT
+&kp LEFT_SHIFT  &kp Z  &kp X  &kp C     &kp V  &kp B        &kp RET                &none               &kp N        &kp M  &kp COMMA  &kp DOT  &kp FSLH  &kp RIGHT_SHIFT
+                              &kp LCTRL  &kp LALT  &mo 2                                               &mo 1  &kp SPACE  &mo 3
             >;
 
             sensor-bindings = <&rsr_vol &rsr_trans>;
@@ -64,10 +82,10 @@
         lower_layer {
             display-name = "NUMBER";
             bindings = <
-&trans  &kp N1           &kp N2          &kp N3        &kp N4        &kp N5                                         &mmv MOVE_UP                     &kp N6           &kp N7           &kp N8           &kp N9           &kp N0    &kp BSPC
-&trans  &bt BT_CLR_ALL   &bt BT_SEL 0    &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3                   &mmv MOVE_LEFT  &mkp LCLK       &mmv MOVE_RIGHT  &kp LEFT         &kp DOWN         &kp UP           &kp RIGHT        &kp HOME  &kp PG_UP
-&trans  &rgb_ug RGB_OFF  &rgb_ug RGB_ON  &trans        &trans        &rgb_ug RGB_EFF  &kp C_MUTE                    &mmv MOVE_DOWN                   &rgb_ug RGB_EFR  &rgb_ug RGB_SPI  &rgb_ug RGB_BRI  &rgb_ug RGB_BRD  &kp END   &kp PG_DN
-                                         &trans        &trans        &trans                                                                          &kp INS          &kp DEL          &trans
+&kp GRAVE       &kp N1           &kp N2          &kp N3        &kp N4        &kp N5                                         &none                            &kp N6           &kp N7           &kp N8           &kp N9           &kp N0    &kp BSPC
+&kp BSLH        &kp MINUS       &kp EQUAL       &kp LPAR      &kp RPAR      &trans                   &none           &none           &none            &kp LEFT         &kp DOWN         &kp UP           &kp RIGHT        &kp HOME  &kp PG_UP
+&trans  &trans           &kp LBKT        &kp RBKT      &trans        &trans  &kp C_MUTE                    &none                            &trans           &trans           &trans           &trans           &kp END   &kp PG_DN
+                                         &trans        &trans        &trans                                                                          &trans          &kp DEL          &trans
             >;
 
             sensor-bindings = <&rsr_vol &rsr_trans>;
@@ -76,10 +94,10 @@
         raise_layer {
             display-name = "SYMBOL";
             bindings = <
-&trans  &kp EXCL      &kp AT        &kp HASH   &kp DLLR   &kp PRCNT                            &mmv MOVE_UP                     &kp CARET  &kp AMPS   &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
-&trans  &bt BT_CLR    &mkp LCLK     &mkp MCLK  &mkp RCLK  &mkp MB4             &mmv MOVE_LEFT  &mkp LCLK       &mmv MOVE_RIGHT  &kp MINUS  &kp EQUAL  &kp LBKT   &kp RBKT  &kp BSLH  &kp GRAVE
-&trans  &out OUT_USB  &out OUT_BLE  &none      &none      &mkp MB5   &trans                    &mmv MOVE_DOWN                   &kp UNDER  &kp PLUS   &kp LBRC   &kp RBRC  &kp PIPE  &kp TILDE
-                                    &trans     &trans     &kp SPACE                                                             &kp RET    &trans     &trans
+&kp TILDE  &kp EXCL   &kp AT    &kp HASH  &kp DLLR  &kp PRCNT                            &none                            &kp CARET  &kp AMPS  &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
+&trans  &kp MINUS  &kp PLUS   &kp LBRC  &kp RBRC  &trans               &none           &none           &none            &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT &trans    &trans
+&trans  &trans    &trans    &kp LBKT  &kp RBKT  &trans   &trans                    &none                            &kp TILDE  &kp FSLH  &kp SEMI   &kp COLON &kp DELETE  &trans
+                                    &trans    &trans    &trans                                                             &kp RET    &trans    &trans
             >;
 
             sensor-bindings = <&rsr_vol &rsr_trans>;
@@ -88,9 +106,9 @@
         layer_3 {
             display-name = "Fn";
             bindings = <
-&studio_unlock  &kp F1      &kp F2     &kp F3       &kp F4     &kp F5                                  &mmv MOVE_UP                     &kp F6       &kp F7     &kp F8       &kp F9      &kp F10          &kp F11
-&trans          &trans      &mkp LCLK  &mkp MCLK    &mkp RCLK  &mkp MB4                &mmv MOVE_LEFT  &mkp LCLK       &mmv MOVE_RIGHT  &bootloader  &mkp LCLK  &mkp MCLK    &mkp RCLK   &kp PRINTSCREEN  &kp F12
-&trans          &sys_reset  &trans     &bootloader  &trans     &mkp MB5  &kp C_MUTE                    &mmv MOVE_DOWN                   &trans       &trans     &bootloader  &sys_reset  &kp SCROLLLOCK   &kp PAUSE_BREAK
+&studio_unlock  &kp F1      &kp F2     &kp F3       &kp F4     &kp F5                                  &none                            &kp F6       &kp F7     &kp F8       &kp F9      &kp F10          &kp F11
+&trans          &bt BT_CLR_ALL &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3                                  &none           &none           &none            &rgb_ug RGB_ON &rgb_ug RGB_EFF &rgb_ug RGB_EFR &rgb_ug RGB_SPI &rgb_ug RGB_BRI &rgb_ug RGB_BRD
+&rgb_ug RGB_OFF  &sys_reset  &mkp LCLK  &mkp MCLK    &mkp RCLK  &mkp MB5  &kp C_MUTE                    &none                            &kp C_VOL_DN &kp C_VOL_UP &kp C_MUTE &kp C_BRI_DN &kp C_BRI_UP &kp C_PLAY_PAUSE
                                        &trans       &trans     &trans                                                                   &trans       &trans     &trans
             >;
 

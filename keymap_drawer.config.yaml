@@ -522,6 +522,16 @@ parse_config:
       hold: zoom
 
   zmk_combos:
+    jk_esc:
+      align: bottom
+      offset: 0.05
+    df_ret:
+      align: bottom
+    cd_grave:
+      align: bottom
+      offset: 0.1
+    softoff:
+      align: top
     combo_to_2:
       align: top
     combo_to_3:
