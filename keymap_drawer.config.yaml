@@ -527,8 +527,6 @@ parse_config:
       offset: 0.05
     df_ret:
       align: bottom
-    op_del:
-      align: top
     cd_grave:
       align: bottom
       offset: 0.1
