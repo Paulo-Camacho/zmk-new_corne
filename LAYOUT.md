@@ -67,12 +67,12 @@ Hold **left inner thumb**.
 
 ```
 TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
-HOME:   ·  -  =  [  ]  |  _  +  {  }  |  `
-BOT:    ·  ·  ·  ·  ·  |  ~  /  ;  :  Del
+HOME:   ·  -  =  ·  ·  |  _  +  {  }  |  `
+BOT:    ·  ·  [  ]  ·  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
 ```
 
-Optimized for programming: brackets and operators on the home row.
+Optimized for programming: `[` `]` on **C** / **V**, braces on home row right.
 
 ---
 
