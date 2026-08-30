@@ -51,13 +51,13 @@ Hold **right inner thumb**.
 
 ```
 TOP:    `  1  2  3  4  5  |  6  7  8  9  0  Bsp
-HOME:   (  )  {  }  ·  |  ←  ↓  ↑  →  Home PgUp
-        A  S  D  F        H  J  K  L  ;  '
+HOME:   \  (  )  -  =  ·  |  ←  ↓  ↑  →  Home PgUp
+        ·  A  S  D  F        H  J  K  L  ;  '
 BOT:    ·  ·  [  ]  ·  Mute |  ·  ·  ·  ·  End PgDn
 THUMBS: ·  ·  ·           |  Ins Del ·
 ```
 
-Also: mouse movement via joystick directions on this layer.
+Shift+D → `_`, shift+F → `+`. Pinky left of **A** is `\` (shift → `|`).
 
 ---
 
@@ -68,7 +68,7 @@ Hold **left inner thumb**.
 ```
 TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
 HOME:   ·  (  )  {  }  ·  |  ←  ↓  ↑  →  ·  ·
-BOT:    ·  ·  [  ]  ·  |  ~  /  ;  :  Del
+BOT:    ·  ·  ·  [  ]  ·  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
 ```
 

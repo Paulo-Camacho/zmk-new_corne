@@ -83,7 +83,7 @@
             display-name = "NUMBER";
             bindings = <
 &kp GRAVE       &kp N1           &kp N2          &kp N3        &kp N4        &kp N5                                         &none                            &kp N6           &kp N7           &kp N8           &kp N9           &kp N0    &kp BSPC
-&trans  &kp LPAR        &kp RPAR        &kp LBRC      &kp RBRC      &trans                   &none           &none           &none            &kp LEFT         &kp DOWN         &kp UP           &kp RIGHT        &kp HOME  &kp PG_UP
+&kp BSLH        &kp LPAR        &kp RPAR        &kp MINUS     &kp EQUAL     &trans                   &none           &none           &none            &kp LEFT         &kp DOWN         &kp UP           &kp RIGHT        &kp HOME  &kp PG_UP
 &trans  &trans           &kp LBKT        &kp RBKT      &trans        &trans  &kp C_MUTE                    &none                            &trans           &trans           &trans           &trans           &kp END   &kp PG_DN
                                          &trans        &trans        &trans                                                                          &kp INS          &kp DEL          &trans
             >;
@@ -96,7 +96,7 @@
             bindings = <
 &kp TILDE  &kp EXCL   &kp AT    &kp HASH  &kp DLLR  &kp PRCNT                            &none                            &kp CARET  &kp AMPS  &kp ASTRK  &kp LPAR  &kp RPAR  &kp BSPC
 &trans  &kp LPAR  &kp RPAR  &kp LBRC  &kp RBRC  &trans               &none           &none           &none            &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT &trans    &trans
-&trans  &trans    &kp LBKT  &kp RBKT  &trans    &trans   &trans                    &none                            &kp TILDE  &kp FSLH  &kp SEMI   &kp COLON &kp DELETE  &trans
+&trans  &trans    &trans    &kp LBKT  &kp RBKT  &trans   &trans                    &none                            &kp TILDE  &kp FSLH  &kp SEMI   &kp COLON &kp DELETE  &trans
                                     &trans    &trans    &trans                                                             &kp RET    &trans    &trans
             >;
 
