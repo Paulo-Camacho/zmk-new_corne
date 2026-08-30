@@ -69,7 +69,7 @@ Hold **left inner thumb**.
 ```
 TOP:    ~  !  @  #  $  %  |  ^  &  *  (  )  Bsp
 HOME:   ·  -  =  [  ]  |  _  +  {  }  |  `
-BOT:    ·  _  +  {  }  |  ~  /  ;  :  Del
+BOT:    ·  ·  ·  ·  ·  |  ~  /  ;  :  Del
 THUMBS: ·  ·  ·           |  Ret ·  ·
 ```
 
