@@ -82,8 +82,8 @@ Hold **right outer thumb** (Fn only — no Alt tap).
 
 ```
 TOP:    Studio F1 F2 F3 F4 F5  |  F6  F7  F8  F9  F10 F11
-HOME:   BT  BT BT BT BT · |  RGBon RGBeff RGBefr RGBspi RGBbri RGBbrd
-        clr 0  1  2  3   (A S D F G)
+HOME:   ·  BT BT BT BT BT |  RGBon RGBeff RGBefr RGBspi RGBbri RGBbrd
+           clr 0  1  2  3   (S D F G)
 BOT:    RGBoff reset mouse ·  ·  Mute |  ·  ·  boot reset Scroll Pause
 THUMBS: ·  ·  ·                |  ·  ·  ·
 ```
