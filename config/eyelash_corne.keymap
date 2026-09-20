@@ -43,7 +43,7 @@
 
         df_ret {
             bindings = <&kp RET>;
-            key-positions = <16 17>;
+            key-positions = <36 37>;
             layers = <0>;
             timeout-ms = <50>;
             require-prior-idle-ms = <150>;
