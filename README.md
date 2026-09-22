@@ -23,9 +23,16 @@ See [VENDOR.md](VENDOR.md) for archived sources, pinned commits, and local build
 
 ## Live keymap editing
 
-`tools/keymap-studio/` is a local ZMK Studio client: plug the left half in over USB,
-run `tools/keymap-studio/serve.sh`, and edit bindings in real time. See
-[tools/keymap-studio/README.md](tools/keymap-studio/README.md).
+`tools/keymap-studio/` is a local ZMK Studio client: plug the left half in over USB
+and edit bindings, layers and combos in real time.
+
+```bash
+tools/keymap-studio/serve.sh          # then open http://localhost:8181/
+```
+
+Needs Python 3 and a Chromium-based browser (WebSerial). Stop it with `Ctrl-C`.
+Pass a port to use something other than 8181, and see
+[tools/keymap-studio/README.md](tools/keymap-studio/README.md) for the full guide.
 
 ## Keymap Diagram
 
