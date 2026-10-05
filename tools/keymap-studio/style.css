@@ -1,0 +1,713 @@
+/* NeetCode-flavoured light UI: white cards, grey rules, green accent. */
+:root {
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --line: #e5e7eb;
+  --line-strong: #d1d5db;
+  --text: #111827;
+  --text-2: #374151;
+  --muted: #6b7280;
+  --accent: #2cbb5d;
+  --accent-dark: #22a04e;
+  --accent-wash: #e8f8ee;
+  --accent-ink: #14713a;
+  --danger: #ef4444;
+  --danger-wash: #fef2f2;
+  --warn: #b45309;
+  --plate: #f3f4f6;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(17, 24, 39, .06), 0 1px 3px rgba(17, 24, 39, .04);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+/* A class that sets `display` outbids the UA's `[hidden]` rule, which left
+   toggled cards painted while JS thought they were gone. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font: 14px/1.5 "Inter", ui-sans-serif, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text-2);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+
+/* --- header -------------------------------------------------------------- */
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+header h1 {
+  font-size: 15px;
+  margin: 0 12px 0 0;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header .spacer { flex: 1; }
+
+button, select, input {
+  font: inherit;
+  font-size: 13px;
+  color: var(--text-2);
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 6px 12px;
+  transition: background .12s, border-color .12s, color .12s;
+}
+
+button { cursor: pointer; font-weight: 500; }
+button:hover:not(:disabled) { background: #f9fafb; border-color: var(--muted); }
+button:disabled { opacity: .45; cursor: default; }
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  font-weight: 600;
+}
+button.primary:hover:not(:disabled) { background: var(--accent-dark); border-color: var(--accent-dark); }
+
+button.danger { color: var(--danger); }
+button.danger:hover:not(:disabled) { background: var(--danger-wash); border-color: var(--danger); }
+
+.status { color: var(--muted); font-size: 13px; }
+.status.unsaved {
+  color: var(--warn);
+  font-weight: 600;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.status.error { color: var(--danger); }
+
+/* --- shell --------------------------------------------------------------- */
+
+main {
+  display: grid;
+  grid-template-columns: 210px 1fr clamp(320px, 27vw, 440px);
+  min-height: 0;
+  gap: 0;
+}
+
+aside, section, .inspector { overflow: auto; padding: 16px; min-height: 0; }
+aside { border-right: 1px solid var(--line); background: var(--card); }
+.inspector { border-left: 1px solid var(--line); background: var(--card); }
+
+h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+
+/* --- layers -------------------------------------------------------------- */
+
+.layer-list { display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; }
+
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-weight: 500;
+  color: var(--text-2);
+}
+.layer-row:hover { background: #f3f4f6; }
+.layer-row.active {
+  background: var(--accent-wash);
+  border-color: #a7e3bf;
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.layer-row .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layer-row .idx {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  min-width: 12px;
+}
+.layer-row.active .idx { color: var(--accent); }
+
+.layer-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.layer-actions button { padding: 5px 10px; font-size: 12px; }
+
+/* --- board --------------------------------------------------------------- */
+
+section { display: flex; justify-content: center; align-items: flex-start; }
+
+.board-col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.board-fit { position: relative; }
+
+.case {
+  display: inline-block;
+  transform-origin: top left;
+  padding: 18px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.plate {
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--plate);
+}
+
+.keyboard { position: relative; }
+
+.key {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3px;
+  border-radius: 7px;
+  background: var(--card);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 1px 1px rgba(17, 24, 39, .05);
+  cursor: pointer;
+  overflow: hidden;
+  line-height: 1.05;
+  transition: border-color .1s, background .1s, box-shadow .1s;
+}
+
+.key:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-wash);
+}
+
+.key.selected {
+  background: var(--accent);
+  border-color: var(--accent-dark);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+/* Unset keys stay visible as structure without competing for attention. */
+.key.dim { background: #fafafa; border-style: dashed; border-color: var(--line); }
+
+.key .main {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+.key .main.medium { font-size: 12px; font-weight: 600; }
+/* Word-shaped labels (NUMBER, SYMBOL) shrink where a single glyph does not. */
+.key .main.long { font-size: 9.5px; font-weight: 600; letter-spacing: .02em; word-break: break-word; }
+
+.key.dim .main { color: #c4c8cf; font-weight: 500; }
+.key.selected .main { color: #fff; }
+
+/* Shifted twin, printed small in the corner like a real keycap. */
+.key .top {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.key.selected .top { color: rgba(255, 255, 255, .88); }
+
+/* Behavior tag for anything that is not a plain key press. */
+.key .sub {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.key.selected .sub { color: rgba(255, 255, 255, .95); }
+
+/* --- inspector ----------------------------------------------------------- */
+
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.field select, .field input { width: 100%; }
+.field select:focus, .field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.mods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.mods label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0;
+}
+.mods label:hover { background: #f9fafb; border-color: var(--muted); }
+.mods label:has(input:checked) {
+  background: var(--accent-wash);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.mods input { width: auto; accent-color: var(--accent); cursor: pointer; }
+
+.quick-mods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+.quick-mods button { padding: 8px 0; font-size: 12px; font-weight: 600; }
+
+.field .filter { margin-bottom: 8px; padding: 9px 12px; font-size: 14px; }
+.field select[size] {
+  /* Sized against the viewport, never the parent: a percentage height here
+     overflows the select's own box and paints over what follows it. */
+  height: clamp(280px, 46vh, 620px);
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.field select[size] option {
+  padding: 7px 10px;
+  border-radius: 6px;
+  line-height: 1.35;
+}
+.field select[size] optgroup { font-size: 11px; letter-spacing: .05em; }
+.field select[size] option:checked { background: var(--accent-wash); color: var(--accent-ink); }
+
+.preview {
+  margin-top: 8px;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent-wash);
+  border: 1px solid #a7e3bf;
+  border-radius: 8px;
+  padding: 6px 9px;
+}
+.preview.warn {
+  color: #991b1b;
+  background: var(--danger-wash);
+  border-color: #fecaca;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.field .mods-field { margin-top: 12px; }
+
+.inspector button.primary {
+  width: 100%;
+  padding: 11px;
+  font-size: 14px;
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  box-shadow: 0 -8px 12px -8px rgba(17, 24, 39, .25);
+}
+
+.log {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: pre-wrap;
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  max-height: 180px;
+  overflow: auto;
+}
+
+.empty { color: var(--muted); }
+
+/* --- combos -------------------------------------------------------------- */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+}
+
+.card-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.card-head h2 { margin: 0; }
+.card-head .spacer { flex: 1; }
+
+.note { font-size: 11px; color: var(--muted); }
+.note code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  background: var(--plate);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.combo-list { display: flex; flex-direction: column; gap: 4px; }
+
+.combo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.combo-row:hover { background: #f9fafb; border-color: var(--line); }
+.combo-row.active { background: var(--accent-wash); border-color: #a7e3bf; }
+/* Combos scoped to other layers stay listed, but recede. */
+.combo-row.other-layer { opacity: .5; }
+
+.combo-name {
+  font-weight: 600;
+  color: var(--text);
+  min-width: 96px;
+}
+
+.combo-keys { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.combo-keys .plus { color: var(--muted); font-size: 11px; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--card);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+.chip.removable { cursor: pointer; }
+.chip.removable:hover { border-color: var(--danger); color: var(--danger); }
+
+.combo-row .arrow { color: var(--muted); }
+
+.combo-binding {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 12px;
+  color: var(--accent-ink);
+  background: var(--accent-wash);
+  border-radius: 5px;
+  padding: 2px 6px;
+}
+
+.combo-meta { margin-left: auto; font-size: 11px; color: var(--muted); }
+
+.combo-edit { padding: 3px 9px; font-size: 11px; }
+
+/* editor */
+
+#combo-editor {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.combo-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.combo-field { display: block; margin-bottom: 10px; }
+.combo-field > span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.combo-field input { width: 100%; }
+.combo-field.wide { margin-top: 4px; }
+
+.combo-keys.editing { min-height: 26px; }
+
+.combo-layers { display: flex; flex-wrap: wrap; gap: 10px; }
+.combo-layers label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+.combo-layers input { accent-color: var(--accent); }
+.combo-layers label:has(input:disabled) { opacity: .45; cursor: default; }
+
+/* Same row, same shape as the numbered layers; a rule sets it apart as the
+   one toggle that overrides the rest. */
+.combo-layers .combo-all-layers {
+  margin-left: 4px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line);
+  font-weight: 600;
+}
+.combo-layers .combo-all-layers:has(input:checked) { color: var(--accent-ink); }
+
+.combo-actions { display: flex; gap: 8px; margin-top: 4px; }
+.combo-actions .primary { flex: 0 0 auto; }
+
+/* board markers */
+
+.key.combo-member {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  box-shadow: 0 0 0 2px rgba(44, 187, 93, .25);
+}
+.key.combo-member .main { color: var(--accent-ink); }
+
+/* A key that takes part in some combo on this layer, none of them in focus. */
+.key.combo-touched::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .65;
+}
+
+.combo-order {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  min-width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 13px;
+  text-align: center;
+}
+
+/* --- binding reference sheet --------------------------------------------- */
+
+.sheet-group {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin: 14px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.sheet-group:first-child { margin-top: 0; }
+
+.sheet-row {
+  display: grid;
+  grid-template-columns: 190px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  font-size: 13px;
+}
+.sheet-row:hover { background: #f9fafb; }
+
+.sheet-code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  background: var(--accent-wash);
+  border-radius: 5px;
+  padding: 3px 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheet-what { color: var(--text-2); }
+
+.sheet-tags { display: flex; gap: 5px; }
+.tag {
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.tag.on-device { background: var(--accent-wash); color: var(--accent-ink); border: 1px solid #a7e3bf; }
+.tag.in-keymap { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+.sheet-use { padding: 3px 10px; font-size: 11px; }
+
+button.link {
+  background: none;
+  border: none;
+  padding: 0 0 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: none;
+  letter-spacing: 0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+button.link:hover { background: none; color: var(--accent-dark); }
+
+@media (max-width: 900px) {
+  .sheet-row { grid-template-columns: 1fr; gap: 4px; }
+}
+
+.board-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.board-empty strong { color: var(--text); font-size: 14px; }
+.board-empty em { font-style: normal; font-weight: 600; color: var(--text-2); }
+
+/* --- apply pipeline ------------------------------------------------------ */
+
+.steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.steps li {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  position: relative;
+}
+.steps li + li::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: -2px;
+  width: 1px;
+  height: 12px;
+  background: var(--line-strong);
+}
+
+.steps .dot {
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  background: var(--card);
+  justify-self: center;
+}
+
+.steps li strong { color: var(--muted); font-weight: 600; font-size: 13px; }
+
+.steps li.active { background: #f9fafb; }
+.steps li.active .dot { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
+.steps li.active strong { color: var(--text); }
+
+.steps li.done .dot { border-color: var(--accent); background: var(--accent); }
+.steps li.done strong { color: var(--text); }
+
+.steps li.failed .dot { border-color: var(--danger); background: var(--danger); }
+.steps li.failed strong { color: var(--danger); }
+.steps li.failed .step-detail { color: var(--danger); }
+
+.step-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.step-detail code {
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  background: var(--plate);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.step-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+.step-actions input { flex: 1; max-width: 340px; }
+
+/* --- typing test --------------------------------------------------------- */
+
+.typing.listening { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
+
+.typing-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-height: 30px;
+}
+
+.typed {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--accent-wash);
+  border: 1px solid #a7e3bf;
+  font-size: 11px;
+  color: var(--accent-ink);
+}
+.typed strong { font-size: 13px; font-weight: 700; }
+/* A key the current layer has no binding for — a different layer, or a combo. */
+.typed.unmatched { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+
+.key.pressed {
+  background: var(--accent);
+  border-color: var(--accent-dark);
+  box-shadow: 0 0 0 4px var(--accent-wash);
+  transform: translateY(1px);
+}
+.key.pressed .main, .key.pressed .top, .key.pressed .sub { color: #fff; }
+
+/* --- apply panel polish -------------------------------------------------- */
+
+.step-link {
+  display: inline-block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.step-link:hover { color: var(--accent-dark); }
+
+.steps li strong { display: block; margin-bottom: 1px; }
+.step-actions input::placeholder { color: #9ca3af; }

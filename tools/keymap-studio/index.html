@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corne Keymap Studio</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Corne Keymap Studio</h1>
+  <button id="connect" class="primary">Connect</button>
+  <button id="disconnect" disabled>Disconnect</button>
+  <span id="device" class="status">not connected</span>
+  <span class="spacer"></span>
+  <span id="dirty" class="status"></span>
+  <button id="reload" disabled>Reload</button>
+  <button id="discard" class="danger" disabled>Discard</button>
+  <button id="save" class="primary" disabled>Save to flash</button>
+</header>
+<main>
+  <aside>
+    <h2>Layers</h2>
+    <div id="layers" class="layer-list"><span class="empty">—</span></div>
+    <div class="layer-actions">
+      <button id="add-layer" disabled>Add</button>
+      <button id="rename-layer" disabled>Rename</button>
+      <button id="remove-layer" class="danger" disabled>Remove</button>
+      <button id="move-up" disabled>&uarr;</button>
+      <button id="move-down" disabled>&darr;</button>
+    </div>
+    <h2 style="margin-top:16px">Physical layout</h2>
+    <select id="layout" disabled></select>
+  </aside>
+  <section>
+    <div class="board-col">
+      <div id="board-empty" class="card board-empty">
+        <strong>No keyboard connected</strong>
+        <span>Plug the left half in over USB and press <em>Connect</em> to see the board.</span>
+      </div>
+
+      <div id="typing" class="card typing" hidden>
+        <div class="card-head">
+          <h2>Typing test</h2>
+          <span class="note">Keys you press light up on the board, so you can check a binding really works.</span>
+          <span class="spacer"></span>
+          <button id="typing-toggle">Start</button>
+        </div>
+        <div id="typing-readout" class="typing-readout">
+          <span class="empty">Press <em>Start</em>, then type on the keyboard.</span>
+        </div>
+      </div>
+
+      <div id="board-fit" class="board-fit" hidden>
+        <div class="case">
+          <div class="plate">
+            <div id="keyboard" class="keyboard"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card combos">
+        <div class="card-head">
+          <h2>Combos</h2>
+          <span id="combo-note" class="note">
+            Combos live in <code>config/eyelash_corne.keymap</code> &mdash; rebuild and flash to apply.
+          </span>
+          <span class="spacer"></span>
+          <button id="combo-new">New combo</button>
+        </div>
+        <div id="combo-list" class="combo-list"><span class="empty">Loading&hellip;</span></div>
+        <div id="combo-editor" hidden></div>
+      </div>
+
+      <div class="card apply">
+        <div class="card-head">
+          <h2>Apply to keyboard</h2>
+          <span class="note">
+            Combos are compiled into firmware, so applying them means commit &rarr; push &rarr; CI build &rarr; flash.
+          </span>
+          <span class="spacer"></span>
+          <span id="repo-state" class="note"></span>
+        </div>
+        <ol id="apply-steps" class="steps">
+          <li data-step="commit">
+            <span class="dot"></span>
+            <div>
+              <strong>Commit &amp; push the keymap</strong>
+              <div class="step-detail" id="step-commit-detail">Only <code>config/eyelash_corne.keymap</code> is staged.</div>
+              <div class="step-actions">
+                <input id="commit-message" placeholder="Update combos via Keymap Studio">
+                <button id="do-commit">Commit &amp; push</button>
+              </div>
+            </div>
+          </li>
+          <li data-step="build">
+            <span class="dot"></span>
+            <div>
+              <strong>CI build</strong>
+              <div class="step-detail" id="step-build-detail">Waiting for a pushed commit.</div>
+            </div>
+          </li>
+          <li data-step="flash">
+            <span class="dot"></span>
+            <div>
+              <strong>Flash the left half</strong>
+              <div class="step-detail" id="step-flash-detail">Double-tap reset on the left half to mount the bootloader drive.</div>
+              <div class="step-actions">
+                <button id="do-flash" disabled>Flash firmware</button>
+              </div>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Binding reference</h2>
+          <span class="note">
+            A binding is <code>&amp;behavior</code> plus its parameters &mdash;
+            <code>&amp;kp ESCAPE</code> presses Escape, <code>&amp;mo 1</code> holds layer 1.
+          </span>
+          <span class="spacer"></span>
+          <button id="sheet-toggle">Show</button>
+        </div>
+        <div id="binding-sheet" hidden></div>
+      </div>
+
+      <datalist id="binding-options"></datalist>
+    </div>
+  </section>
+  <div class="inspector">
+    <h2>Key</h2>
+    <div id="inspector"><span class="empty">Select a key.</span></div>
+    <div id="log" class="log"></div>
+  </div>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
