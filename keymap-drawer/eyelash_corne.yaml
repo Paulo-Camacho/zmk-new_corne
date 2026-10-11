@@ -202,13 +202,13 @@ combos:
   l: [BASE]
   a: bottom
   o: 0.05
-- p: [16, 17]
+- p: [37, 38]
   k: {t: '$$mdi:keyboard-return$$', type: enter}
   l: [BASE]
   a: bottom
 - p: [38, 39]
   k: {t: '`', s: '~'}
-  l: [BASE, SYMBOL]
+  l: [BASE]
   a: bottom
   o: 0.1
 - p: [1, 15, 29]

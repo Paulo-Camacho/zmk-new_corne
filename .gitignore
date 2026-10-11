@@ -2,4 +2,6 @@ build/
 /zmk/
 /modules/
 .west/
+# Keymap Drawer YAML cache; must not live in config/ (breaks Draw Keymap CI)
+config/eyelash_corne.json
 # Vendored third-party sources are committed under vendor/
