@@ -33,33 +33,7 @@
     combos {
         compatible = "zmk,combos";
 
-        jk_esc {
-            bindings = <&kp ESCAPE>;
-            key-positions = <23 24>;
-            layers = <0>;
-            timeout-ms = <50>;
-            require-prior-idle-ms = <150>;
-        };
-
-        cd_grave {
-            bindings = <&kp GRAVE>;
-            key-positions = <38 39>;
-            layers = <0>;
-            timeout-ms = <50>;
-            require-prior-idle-ms = <150>;
-        };
-
-        softoff {
-            bindings = <&soft_off>;
-            key-positions = <0 13 28>;
-        };
-
-        m,_return {
-            bindings = <&kp RET>;
-            key-positions = <37 38>;
-            timeout-ms = <50>;
-        };
-    };
+};
 
     keymap {
         compatible = "zmk,keymap";
