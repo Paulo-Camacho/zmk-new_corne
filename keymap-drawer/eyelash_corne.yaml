@@ -211,6 +211,6 @@ combos:
   l: [BASE]
   a: bottom
   o: 0.1
-- p: [1, 15, 29]
+- p: [0, 13, 28]
   k: '&soft_off'
   a: top
