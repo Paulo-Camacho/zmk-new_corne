@@ -102,6 +102,31 @@
               <div class="step-detail" id="step-build-detail">Waiting for a pushed commit.</div>
             </div>
           </li>
+          <li data-step="reset-left">
+            <span class="dot"></span>
+            <div>
+              <strong>Clear saved settings — left half</strong>
+              <div class="step-detail" id="step-reset-left-detail">
+                Flash <code>settings_reset</code> once per half so Studio layer overrides and old flash state are wiped. Bluetooth is off until you flash normal firmware again.
+              </div>
+              <div class="step-actions">
+                <button id="do-reset-left" disabled>Flash settings reset</button>
+                <button id="do-rpc-reset" type="button" title="USB only; does not replace settings_reset on both halves">
+                  Reset saved keymap (USB)
+                </button>
+              </div>
+            </div>
+          </li>
+          <li data-step="reset-right">
+            <span class="dot"></span>
+            <div>
+              <strong>Clear saved settings — right half</strong>
+              <div class="step-detail" id="step-reset-right-detail">Plug in the right half, double-tap reset, then flash settings reset.</div>
+              <div class="step-actions">
+                <button id="do-reset-right" disabled>Flash settings reset</button>
+              </div>
+            </div>
+          </li>
           <li data-step="flash-left">
             <span class="dot"></span>
             <div>

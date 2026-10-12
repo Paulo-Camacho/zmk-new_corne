@@ -124,16 +124,23 @@ pipeline from the page:
    swept in. Pushing `main` is blocked by a repository ruleset, so work on a branch.
 2. **CI build** — polls GitHub Actions every 10s for the build of that exact commit
    and reports success, failure or a link to the run.
-3. **Flash left** — double-tap reset on the **left** half; copies
+3. **Settings reset (both halves)** — from the same CI zip, flash
+   `settings_reset-nice_nano_v2-zmk.uf2` to the **left**, then the **right**
+   (USB + double-tap reset each time). This erases Studio-saved layer bindings,
+   RGB/backlight prefs, Bluetooth bonds, and other flash settings so the keyboard
+   matches the compiled keymap and your new combos — not an older live edit.
+   Bluetooth stays off until you flash normal firmware again; re-pair hosts afterward.
+4. **Flash left** — double-tap reset on the **left** half; copies
    `eyelash_corne_studio_left.uf2` from the CI artifact.
-4. **Flash right** — plug in the **right** half, double-tap reset, **Flash right**
+5. **Flash right** — plug in the **right** half, double-tap reset, **Flash right**
    (`eyelash_corne_right … .uf2`). **Required for combo changes** on keys like N, M,
    ,, . — the old left-only flash left stale combos on the right half.
 
-Needs `git` and an authenticated `gh` CLI. Flashing does **not** wipe the keymap
-you edited live: Studio keeps that in the settings partition, which survives a
-firmware update and overrides the compiled keymap. Flashing `settings_reset` is
-what discards it.
+**Reset saved keymap (USB)** (optional, while connected) calls the Studio RPC that
+drops only keymap overrides in flash. It is **not** a substitute for flashing
+`settings_reset` on both halves when you want a clean slate.
+
+Needs `git` and an authenticated `gh` CLI.
 
 ## Layout
 

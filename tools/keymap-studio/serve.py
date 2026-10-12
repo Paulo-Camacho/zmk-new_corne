@@ -28,6 +28,7 @@ MAX_WRITE_BYTES = 512 * 1024
 # Firmware artifact names from build.yaml (exact filenames in the CI zip).
 FIRMWARE_LEFT = "eyelash_corne_studio_left.uf2"
 FIRMWARE_RIGHT = "eyelash_corne_right nice_view-nice_nano_v2-zmk.uf2"
+FIRMWARE_SETTINGS_RESET = "settings_reset-nice_nano_v2-zmk.uf2"
 WORKFLOW_NAME = "Build ZMK firmware (vendored)"
 # nice_nano_v2 in bootloader mode mounts as a mass-storage volume.
 BOOTLOADER_HINTS = ("NICENANO", "NICE_NANO", "CIRCUITPY", "RPI-RP2")
@@ -229,14 +230,21 @@ class StudioHandler(SimpleHTTPRequestHandler):
         payload = self._body()
         run_id = payload.get("runId")
         half = (payload.get("half") or "left").lower()
+        kind = (payload.get("kind") or "firmware").lower()
         if not run_id:
             self._json(400, {"error": "missing runId"})
             return
         if half not in ("left", "right"):
             self._json(400, {"error": 'half must be "left" or "right"'})
             return
+        if kind not in ("firmware", "settings_reset"):
+            self._json(400, {"error": 'kind must be "firmware" or "settings_reset"'})
+            return
 
-        firmware_name = FIRMWARE_LEFT if half == "left" else FIRMWARE_RIGHT
+        if kind == "settings_reset":
+            firmware_name = FIRMWARE_SETTINGS_RESET
+        else:
+            firmware_name = FIRMWARE_LEFT if half == "left" else FIRMWARE_RIGHT
         half_label = "left" if half == "left" else "right"
 
         volume = bootloader_volume()

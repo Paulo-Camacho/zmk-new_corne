@@ -1333,6 +1333,8 @@ const apply = {
   startedAt: 0,
   flashLeftDone: false,
   flashRightDone: false,
+  settingsResetLeftDone: false,
+  settingsResetRightDone: false,
 };
 
 // GitHub's own status strings are not written for people to read.
@@ -1427,10 +1429,14 @@ async function pollBuild() {
       setStepLink("build", build.url, `run ${build.runId}`);
       apply.flashLeftDone = false;
       apply.flashRightDone = false;
-      setStep("flash-left", "active");
-      setStep("flash-right", "", "Flash after the left half, or plug in the right half first if you only need combo keys on that side.");
+      apply.settingsResetLeftDone = false;
+      apply.settingsResetRightDone = false;
+      setStep("reset-left", "active");
+      setStep("reset-right", "", "After the left half, reset the right half the same way.");
+      setStep("flash-left", "", "Available after settings reset on both halves.");
+      setStep("flash-right", "", "Flash after the studio left firmware.");
       watchBootloader();
-      log("firmware built — flash left, then right (USB + double-tap reset each half)", "ok");
+      log("firmware built — settings reset both halves, then flash left and right", "ok");
     } else {
       setStep("build", "failed", `Build ${build.conclusion}.`);
       setStepLink("build", build.url, "open the failed run");
@@ -1451,18 +1457,86 @@ function watchBootloader() {
     const repo = await api("/api/repo").catch(() => null);
     const mounted = Boolean(repo?.bootloader);
     const ready = mounted && apply.runId;
-    $("do-flash-left").disabled = !ready || apply.flashLeftDone;
-    $("do-flash-right").disabled = !ready;
+    const resetsDone = apply.settingsResetLeftDone && apply.settingsResetRightDone;
+    $("do-reset-left").disabled = !ready || apply.settingsResetLeftDone;
+    $("do-reset-right").disabled = !ready || apply.settingsResetRightDone;
+    $("do-flash-left").disabled = !ready || !resetsDone || apply.flashLeftDone;
+    $("do-flash-right").disabled = !ready || !resetsDone;
     const mountMsg = mounted
-      ? `Bootloader at ${repo.bootloader} — choose Flash left or Flash right for whichever half is plugged in.`
+      ? `Bootloader at ${repo.bootloader} — flash the step for whichever half is plugged in.`
       : "Plug in one half over USB, double-tap reset, then flash.";
+    if (!apply.settingsResetLeftDone) {
+      $("step-reset-left-detail").textContent = mountMsg;
+    }
+    if (!apply.settingsResetRightDone) {
+      $("step-reset-right-detail").textContent = apply.settingsResetRightDone
+        ? "Right half settings cleared."
+        : mountMsg;
+    }
     if (!apply.flashLeftDone) {
-      $("step-flash-left-detail").textContent = mountMsg;
+      $("step-flash-left-detail").textContent = resetsDone
+        ? mountMsg
+        : "Finish settings reset on both halves first.";
     }
     $("step-flash-right-detail").textContent = apply.flashRightDone
       ? "Right half flashed for this build."
-      : `${mountMsg} Combos on N/M/, etc. require flashing the right half.`;
+      : resetsDone
+        ? `${mountMsg} Combos on N/M/, etc. require flashing the right half.`
+        : "Finish settings reset on both halves first.";
   }, 2000);
+}
+
+async function flashSettingsResetHalf(half) {
+  const step = half === "left" ? "reset-left" : "reset-right";
+  const button = $(`do-reset-${half}`);
+  button.disabled = true;
+  setStep(step, "active", `Copying settings_reset to the ${half} half…`);
+  try {
+    const result = await api("/api/flash", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ runId: apply.runId, half, kind: "settings_reset" }),
+    });
+    setStep(step, "done", `Flashed ${result.flashed} — settings cleared on boot.`);
+    log(`settings reset on ${half} half (${result.flashed})`, "ok");
+    if (half === "left") {
+      apply.settingsResetLeftDone = true;
+      setStep("reset-right", apply.settingsResetRightDone ? "done" : "active");
+    } else {
+      apply.settingsResetRightDone = true;
+      if (apply.settingsResetLeftDone) {
+        setStep("flash-left", "active");
+        log("both halves reset — flash studio left, then right, then re-pair Bluetooth if needed", "ok");
+      }
+    }
+  } catch (err) {
+    setStep(step, "failed", err.message);
+    log(err.message, "error");
+    button.disabled = false;
+  }
+}
+
+async function resetSavedKeymapRpc() {
+  if (!client.connected) {
+    log("connect the left half over USB to reset saved layer bindings", "error");
+    return;
+  }
+  if (!confirm(
+    "Reset Studio-saved layer bindings to match the firmware in flash?\n\n"
+    + "This does not update combos (still need CI + flash). "
+    + "For a full wipe including Bluetooth bonds, use settings reset on both halves.",
+  )) return;
+  try {
+    const res = await send("core", core.resetSettings());
+    if (res.ok) {
+      log("saved keymap settings cleared — reload and match config/eyelash_corne.keymap", "ok");
+      await loadAll();
+    } else {
+      log("reset saved keymap failed on device", "error");
+    }
+  } catch (err) {
+    log(String(err.message ?? err), "error");
+  }
 }
 
 async function flashFirmwareHalf(half) {
@@ -1520,6 +1594,9 @@ $("do-commit").addEventListener("click", () => guarded(async () => {
   refreshRepoState();
 }));
 
+$("do-reset-left").addEventListener("click", () => guarded(() => flashSettingsResetHalf("left")));
+$("do-reset-right").addEventListener("click", () => guarded(() => flashSettingsResetHalf("right")));
+$("do-rpc-reset").addEventListener("click", () => guarded(() => resetSavedKeymapRpc()));
 $("do-flash-left").addEventListener("click", () => guarded(() => flashFirmwareHalf("left")));
 $("do-flash-right").addEventListener("click", () => guarded(() => flashFirmwareHalf("right")));
 
