@@ -124,7 +124,21 @@ pipeline from the page:
    swept in. Pushing `main` is blocked by a repository ruleset, so work on a branch.
 2. **CI build** — polls GitHub Actions every 10s for the build of that exact commit
    and reports success, failure or a link to the run.
-3. **Settings reset (both halves)** — from the same CI zip, flash
+### Remove all combos but keep keybinds
+
+Combos exist only in the compiled firmware (`combos { … }` in the keymap file), not
+in the Studio settings partition. To wipe combos and leave layer bindings alone:
+
+1. In the Combos panel, delete every combo (or remove the whole `combos` node in the
+   file) and save.
+2. **Commit & push**, wait for CI.
+3. On the apply steps, click **Skip — keep saved keybinds** (do **not** flash
+   `settings_reset`).
+4. **Flash left** and **Flash right** from that build.
+
+Your USB/Studio keybind overrides stay in flash; only combo behavior changes.
+
+3. **Settings reset (both halves, optional)** — from the same CI zip, flash
    `settings_reset-nice_nano_v2-zmk.uf2` to the **left**, then the **right**
    (USB + double-tap reset each time). This erases Studio-saved layer bindings,
    RGB/backlight prefs, Bluetooth bonds, and other flash settings so the keyboard

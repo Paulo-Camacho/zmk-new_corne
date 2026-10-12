@@ -1335,6 +1335,7 @@ const apply = {
   flashRightDone: false,
   settingsResetLeftDone: false,
   settingsResetRightDone: false,
+  settingsResetSkipped: false,
 };
 
 // GitHub's own status strings are not written for people to read.
@@ -1431,6 +1432,7 @@ async function pollBuild() {
       apply.flashRightDone = false;
       apply.settingsResetLeftDone = false;
       apply.settingsResetRightDone = false;
+      apply.settingsResetSkipped = false;
       setStep("reset-left", "active");
       setStep("reset-right", "", "After the left half, reset the right half the same way.");
       setStep("flash-left", "", "Available after settings reset on both halves.");
@@ -1457,7 +1459,8 @@ function watchBootloader() {
     const repo = await api("/api/repo").catch(() => null);
     const mounted = Boolean(repo?.bootloader);
     const ready = mounted && apply.runId;
-    const resetsDone = apply.settingsResetLeftDone && apply.settingsResetRightDone;
+    const resetsDone = apply.settingsResetSkipped
+      || (apply.settingsResetLeftDone && apply.settingsResetRightDone);
     $("do-reset-left").disabled = !ready || apply.settingsResetLeftDone;
     $("do-reset-right").disabled = !ready || apply.settingsResetRightDone;
     $("do-flash-left").disabled = !ready || !resetsDone || apply.flashLeftDone;
@@ -1482,8 +1485,24 @@ function watchBootloader() {
       ? "Right half flashed for this build."
       : resetsDone
         ? `${mountMsg} Combos on N/M/, etc. require flashing the right half.`
-        : "Finish settings reset on both halves first.";
+        : "Finish settings reset on both halves, or skip to keep saved keybinds.";
   }, 2000);
+}
+
+function skipSettingsReset() {
+  if (!apply.runId) return;
+  if (!confirm(
+    "Skip settings reset and keep Studio-saved keybinds in flash?\n\n"
+    + "Combos still update when you flash left and right — they come from the "
+    + "keymap file, not from settings reset.",
+  )) return;
+  apply.settingsResetSkipped = true;
+  apply.settingsResetLeftDone = false;
+  apply.settingsResetRightDone = false;
+  setStep("reset-left", "done", "Skipped — saved keybinds kept.");
+  setStep("reset-right", "done", "Skipped.");
+  setStep("flash-left", "active");
+  log("skipped settings reset — flash both halves to apply combo changes only", "ok");
 }
 
 async function flashSettingsResetHalf(half) {
@@ -1594,6 +1613,7 @@ $("do-commit").addEventListener("click", () => guarded(async () => {
   refreshRepoState();
 }));
 
+$("do-skip-reset").addEventListener("click", () => skipSettingsReset());
 $("do-reset-left").addEventListener("click", () => guarded(() => flashSettingsResetHalf("left")));
 $("do-reset-right").addEventListener("click", () => guarded(() => flashSettingsResetHalf("right")));
 $("do-rpc-reset").addEventListener("click", () => guarded(() => resetSavedKeymapRpc()));

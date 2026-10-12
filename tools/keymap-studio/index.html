@@ -105,13 +105,14 @@
           <li data-step="reset-left">
             <span class="dot"></span>
             <div>
-              <strong>Clear saved settings — left half</strong>
+              <strong>Clear saved settings (optional)</strong>
               <div class="step-detail" id="step-reset-left-detail">
-                Flash <code>settings_reset</code> once per half so Studio layer overrides and old flash state are wiped. Bluetooth is off until you flash normal firmware again.
+                Only needed to wipe Studio layer overrides and Bluetooth bonds. To change or remove <em>combos</em> but keep keybinds, use <strong>Skip</strong> and flash normal firmware below.
               </div>
               <div class="step-actions">
-                <button id="do-reset-left" disabled>Flash settings reset</button>
-                <button id="do-rpc-reset" type="button" title="USB only; does not replace settings_reset on both halves">
+                <button id="do-reset-left" disabled>Flash settings reset (left)</button>
+                <button id="do-skip-reset" type="button" class="linkish">Skip — keep saved keybinds</button>
+                <button id="do-rpc-reset" type="button" title="USB only; wipes Studio keybind overrides, not combos">
                   Reset saved keymap (USB)
                 </button>
               </div>
