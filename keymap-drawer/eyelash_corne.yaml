@@ -202,7 +202,7 @@ combos:
   l: [BASE]
   a: bottom
   o: 0.05
-- p: [37, 38]
+- p: [38, 37]
   k: {t: '$$mdi:keyboard-return$$', type: enter}
   l: [BASE]
   a: bottom
