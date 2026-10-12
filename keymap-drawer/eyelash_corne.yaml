@@ -198,7 +198,7 @@ layers:
   - {type: held}
 combos:
 - p: [23, 24]
-  k: {t: '$$mdi:keyboard-return$$', type: enter}
+  k: $$mdi:keyboard-esc$$
   l: [BASE]
 - p: [37, 38]
   k: {t: '$$mdi:keyboard-return$$', type: enter}
