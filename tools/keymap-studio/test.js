@@ -8,6 +8,8 @@ import { frame, Unframer } from "./framing.js";
 import { encodeRequest, decodeResponse, core, behaviors, keymap } from "./messages.js";
 import { encodeKeycode, keycodeName, usageGroups, searchText, PAGE_KEYBOARD } from "./keycodes.js";
 import { parseCombos, writeCombos, comboAppliesToLayer, findBlock } from "./combos.js";
+import { parseKeymapLayerNames, parseKeyPositions } from "./keymap-layers.js";
+import { EYELASH_CORNE_PHYSICAL_KEYS } from "./physical-layout.js";
 
 let failures = 0;
 function check(name, fn) {
@@ -466,6 +468,20 @@ check("findBlock matches braces rather than the first closer", () => {
   const block = findBlock(SAMPLE_KEYMAP, "keymap");
   assert.ok(block.body.includes("default_layer {"));
   assert.ok(block.body.includes("&kp A &kp B"));
+});
+
+check("static eyelash layout has 48 keys", () => {
+  assert.equal(EYELASH_CORNE_PHYSICAL_KEYS.length, 48);
+});
+
+check("keymap layer names parse from devicetree", () => {
+  const layers = parseKeymapLayerNames(SAMPLE_KEYMAP);
+  assert.equal(layers.length, 1);
+  assert.equal(layers[0].nodeName, "default_layer");
+});
+
+check("manual combo positions parse and dedupe", () => {
+  assert.deepEqual(parseKeyPositions("23 24 23 99 foo"), [23, 24]);
 });
 
 console.log(failures ? `\n${failures} test(s) failed` : "\nall tests passed");

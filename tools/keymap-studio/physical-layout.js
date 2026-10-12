@@ -1,0 +1,58 @@
+// Eyelash Corne physical key geometry — copied from boards/shields/eyelash_corne/eyelash_corne-layouts.dtsi
+// so combo position picking works without a USB connection (combos are file-only, not RPC).
+
+/** @type {{ width: number, height: number, x: number, y: number, r: number, rx: number, ry: number }[]} */
+export const EYELASH_CORNE_PHYSICAL_KEYS = [
+  { width: 100, height: 100, x: 0, y: 37, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 100, y: 37, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 200, y: 12, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 300, y: 0, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 400, y: 12, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 500, y: 24, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 925, y: 24, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1150, y: 24, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1250, y: 12, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1350, y: 0, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1450, y: 12, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1550, y: 37, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1650, y: 37, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 0, y: 137, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 100, y: 137, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 200, y: 112, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 300, y: 100, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 400, y: 112, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 500, y: 124, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 825, y: 124, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 925, y: 124, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1025, y: 124, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1150, y: 124, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1250, y: 112, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1350, y: 100, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1450, y: 112, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1550, y: 137, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1650, y: 137, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 0, y: 237, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 100, y: 237, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 200, y: 212, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 300, y: 200, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 400, y: 212, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 500, y: 224, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 625, y: 224, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 925, y: 224, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1150, y: 224, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1250, y: 212, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1350, y: 200, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1450, y: 212, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1550, y: 237, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1650, y: 237, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 350, y: 312, r: 1200, rx: 450, ry: 412 },
+  { width: 100, height: 100, x: 450, y: 312, r: 2400, rx: 515, ry: 433 },
+  { width: 100, height: 100, x: 550, y: 312, r: -2400, rx: 1230, ry: 433 },
+  { width: 100, height: 100, x: 1100, y: 312, r: -1200, rx: 1300, ry: 412 },
+  { width: 100, height: 100, x: 1200, y: 312, r: 0, rx: 0, ry: 0 },
+  { width: 100, height: 100, x: 1300, y: 312, r: 0, rx: 0, ry: 0 },
+];
+
+export function staticEyelashLayout() {
+  return { name: "Eyelash Corne (file layout)", keys: EYELASH_CORNE_PHYSICAL_KEYS };
+}

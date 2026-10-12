@@ -1,6 +1,8 @@
 import { StudioClient } from "./client.js";
 import { parseCombos, writeCombos, comboAppliesToLayer } from "./combos.js";
+import { parseKeymapLayerNames, parseKeyPositions } from "./keymap-layers.js";
 import { positionLabel } from "./labels.js";
+import { staticEyelashLayout } from "./physical-layout.js";
 import { BINDING_GROUPS, scanLocalBehaviors, scanUsedBindings } from "./bindings.js";
 import { core, behaviors as behaviorReq, keymap as keymapReq } from "./messages.js";
 import {
@@ -22,6 +24,7 @@ const state = {
   // Combos are not part of the RPC protocol; they come from the .keymap file.
   keymapText: null,
   keymapPath: "",
+  keymapLayerNames: [],
   combos: [],
   comboSelected: null,
   comboDraft: null,
@@ -302,11 +305,39 @@ function activeLayout() {
 }
 
 // What is actually missing, so a connected keyboard never reads as unplugged.
+function comboLayerEntries() {
+  const rpc = state.keymap?.layers ?? [];
+  if (rpc.length) return rpc.map((layer, index) => ({ index, name: layer.name || `Layer ${index}` }));
+  return state.keymapLayerNames.map((layer, index) => ({
+    index,
+    name: layer.name || layer.nodeName || `Layer ${index}`,
+  }));
+}
+
+// Board for combo picking works from the static file layout; layer edits need USB.
+function resolveBoard() {
+  const rpcLayout = activeLayout();
+  const rpcLayer = state.keymap?.layers[state.layerIndex];
+  if (rpcLayout && rpcLayer) {
+    return { layout: rpcLayout, rpcLayer, staticOnly: false };
+  }
+  if (state.comboDraft) {
+    return { layout: staticEyelashLayout(), rpcLayer: null, staticOnly: true };
+  }
+  return null;
+}
+
 function boardGapText() {
+  if (state.comboDraft && !client.connected) {
+    return [
+      "Combo editor — static layout",
+      "Click keys below to pick positions. Connect over USB to edit layer bindings live.",
+    ];
+  }
   if (!client.connected) {
     return [
       "No keyboard connected",
-      "Plug the left half in over USB and press Connect to see the board.",
+      "Press New combo to pick key positions here, or Connect to edit layers live.",
     ];
   }
   if (!activeLayout()) {
@@ -327,15 +358,17 @@ function boardGapText() {
 function renderKeyboard() {
   const host = $("keyboard");
   host.textContent = "";
-  const layout = activeLayout();
-  const layer = state.keymap?.layers[state.layerIndex];
+  const board = resolveBoard();
+  const layout = board?.layout;
+  const layer = board?.rpcLayer;
+  const staticLabels = board?.staticOnly ?? false;
 
   // With nothing to draw, the empty case reads as a stray icon; hide it and
   // say what is missing instead.
-  const hasBoard = Boolean(layout && layer);
+  const hasBoard = Boolean(board);
   $("board-fit").hidden = !hasBoard;
   $("board-empty").hidden = hasBoard;
-  $("typing").hidden = !hasBoard;
+  $("typing").hidden = !hasBoard || staticLabels;
   if (!hasBoard) {
     const [title, detail] = boardGapText();
     const empty = $("board-empty");
@@ -372,10 +405,15 @@ function renderKeyboard() {
       el.append(order);
     }
 
-    const binding = layer.bindings[position];
-    const label = binding
-      ? bindingLabel(binding)
-      : { main: "?", sub: "", dim: true, title: "no binding" };
+    const binding = layer?.bindings?.[position];
+    const label = staticLabels || !binding
+      ? {
+        main: positionLabel(position),
+        sub: "",
+        dim: false,
+        title: `position ${position} · ${positionLabel(position)}`,
+      }
+      : bindingLabel(binding);
     if (label.dim) el.classList.add("dim");
 
     // Stacked legend: shifted symbol above, the key itself below — the way a
@@ -746,6 +784,7 @@ async function loadCombos() {
     state.keymapText = data.text;
     state.keymapPath = data.path;
     state.combos = parseCombos(data.text);
+    state.keymapLayerNames = parseKeymapLayerNames(data.text);
     state.usedBindings = scanUsedBindings(data.text);
     state.localBehaviors = scanLocalBehaviors(data.text);
     log(`loaded ${state.combos.length} combo(s) from ${state.keymapPath}`, "ok");
@@ -936,8 +975,17 @@ function renderComboEditor() {
   const positions = document.createElement("div");
   positions.className = "combo-field wide";
   positions.append(Object.assign(document.createElement("span"), {
-    textContent: "Key positions — click keys on the board to add or remove",
+    textContent: "Key positions — click the board, or type indices (0–47)",
   }));
+  const posInput = document.createElement("input");
+  posInput.placeholder = "e.g. 23 24";
+  posInput.value = draft.keyPositions.join(" ");
+  posInput.addEventListener("change", () => {
+    draft.keyPositions = parseKeyPositions(posInput.value);
+    renderKeyboard();
+    renderComboEditor();
+  });
+  positions.append(posInput);
   const chips = document.createElement("div");
   chips.className = "combo-keys editing";
   if (!draft.keyPositions.length) {
@@ -979,7 +1027,7 @@ function renderComboEditor() {
 
   const layerBoxes = document.createElement("div");
   layerBoxes.className = "combo-layers";
-  (state.keymap?.layers ?? []).forEach((layer, index) => {
+  comboLayerEntries().forEach(({ index, name }) => {
     const holder = document.createElement("label");
     const input = document.createElement("input");
     input.type = "checkbox";
@@ -991,7 +1039,7 @@ function renderComboEditor() {
       // Unticking the last layer is the same as "all layers": keep the toggle honest.
       renderComboEditor();
     });
-    holder.append(input, document.createTextNode(`${index} ${layer.name || ""}`.trim()));
+    holder.append(input, document.createTextNode(`${index} ${name}`.trim()));
     layerBoxes.append(holder);
   });
   layerBoxes.append(allHolder);
@@ -1006,7 +1054,10 @@ function renderComboEditor() {
   save.textContent = isNew ? "Create combo" : "Save combo";
   save.addEventListener("click", async () => {
     if (!draft.name) return log("combo needs a name", "error");
-    if (!draft.bindings.startsWith("&")) return log("binding must start with & (e.g. &kp ESCAPE)", "error");
+    draft.bindings = draft.bindings.trim();
+    if (!/^&\S/.test(draft.bindings)) {
+      return log("binding must look like &kp ESCAPE or &soft_off", "error");
+    }
     if (draft.keyPositions.length < 2) return log("a combo needs at least two key positions", "error");
 
     const clash = state.combos.findIndex((c, i) => c.name === draft.name && i !== state.comboSelected);

@@ -80,7 +80,9 @@ every other edit in this tool, which is live.
 - Combos on the current layer mark their keys with a green dot; selecting one
   highlights its keys on the board.
 - **Edit** or **New combo**, then click keys on the board to choose the positions
-  (numbered in press order) and fill in the binding, e.g. `&kp ESCAPE`.
+  (numbered in press order) and fill in the binding, e.g. `&kp ESCAPE`. You do
+  **not** need USB for this: **New combo** shows a static Eyelash Corne layout from
+  the repo, and you can type positions manually (e.g. `23 24`) if you prefer.
 - **Binding reference** lists every standard ZMK binding with its parameters and
   an example, tags which ones the connected firmware reports and which your keymap
   already uses, and adds the custom behaviors your keymap declares (`&rsr_vol`,
