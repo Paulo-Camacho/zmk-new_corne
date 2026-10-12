@@ -198,17 +198,8 @@ layers:
   - {type: held}
 combos:
 - p: [23, 24]
-  k: $$mdi:keyboard-esc$$
+  k: {t: '$$mdi:keyboard-return$$', type: enter}
   l: [BASE]
-  a: bottom
-  o: 0.05
-- p: [38, 39]
-  k: {t: '`', s: '~'}
-  l: [BASE]
-  a: bottom
-  o: 0.1
-- p: [0, 13, 28]
-  k: '&soft_off'
-  a: top
 - p: [37, 38]
   k: {t: '$$mdi:keyboard-return$$', type: enter}
+  l: [BASE]
