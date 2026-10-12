@@ -122,9 +122,11 @@ pipeline from the page:
    swept in. Pushing `main` is blocked by a repository ruleset, so work on a branch.
 2. **CI build** — polls GitHub Actions every 10s for the build of that exact commit
    and reports success, failure or a link to the run.
-3. **Flash** — double-tap reset on the left half; when the bootloader drive mounts,
-   the button enables, downloads the `firmware` artifact, and copies
-   `eyelash_corne_studio_left.uf2` onto it.
+3. **Flash left** — double-tap reset on the **left** half; copies
+   `eyelash_corne_studio_left.uf2` from the CI artifact.
+4. **Flash right** — plug in the **right** half, double-tap reset, **Flash right**
+   (`eyelash_corne_right … .uf2`). **Required for combo changes** on keys like N, M,
+   ,, . — the old left-only flash left stale combos on the right half.
 
 Needs `git` and an authenticated `gh` CLI. Flashing does **not** wipe the keymap
 you edited live: Studio keeps that in the settings partition, which survives a

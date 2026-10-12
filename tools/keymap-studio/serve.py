@@ -25,8 +25,9 @@ REPO = (HERE / ".." / "..").resolve()
 KEYMAP = (REPO / "config" / "eyelash_corne.keymap").resolve()
 MAX_WRITE_BYTES = 512 * 1024
 
-# The firmware the keyboard actually runs, as named in build.yaml.
-FIRMWARE_NAME = "eyelash_corne_studio_left.uf2"
+# Firmware artifact names from build.yaml (exact filenames in the CI zip).
+FIRMWARE_LEFT = "eyelash_corne_studio_left.uf2"
+FIRMWARE_RIGHT = "eyelash_corne_right nice_view-nice_nano_v2-zmk.uf2"
 WORKFLOW_NAME = "Build ZMK firmware (vendored)"
 # nice_nano_v2 in bootloader mode mounts as a mass-storage volume.
 BOOTLOADER_HINTS = ("NICENANO", "NICE_NANO", "CIRCUITPY", "RPI-RP2")
@@ -227,15 +228,22 @@ class StudioHandler(SimpleHTTPRequestHandler):
     def api_flash(self):
         payload = self._body()
         run_id = payload.get("runId")
+        half = (payload.get("half") or "left").lower()
         if not run_id:
             self._json(400, {"error": "missing runId"})
             return
+        if half not in ("left", "right"):
+            self._json(400, {"error": 'half must be "left" or "right"'})
+            return
+
+        firmware_name = FIRMWARE_LEFT if half == "left" else FIRMWARE_RIGHT
+        half_label = "left" if half == "left" else "right"
 
         volume = bootloader_volume()
         if volume is None:
             self._json(409, {
                 "error": "no bootloader drive mounted",
-                "hint": "double-tap the reset button on the left half, then try again",
+                "hint": f"double-tap reset on the {half_label} half, then try again",
             })
             return
 
@@ -247,13 +255,16 @@ class StudioHandler(SimpleHTTPRequestHandler):
                 self._json(500, {"error": f"artifact download failed: {err or out}"})
                 return
 
-            firmware = next(Path(tmp).rglob(FIRMWARE_NAME), None)
+            firmware = next(
+                (p for p in Path(tmp).rglob("*.uf2") if p.name == firmware_name),
+                None,
+            )
             if firmware is None:
-                self._json(500, {"error": f"{FIRMWARE_NAME} not in the artifact"})
+                self._json(500, {"error": f"{firmware_name} not in the artifact"})
                 return
 
             try:
-                shutil.copy2(firmware, volume / FIRMWARE_NAME)
+                shutil.copy2(firmware, volume / firmware_name)
             except OSError as exc:
                 # The board reboots the moment the write completes, so an
                 # error on close is normal and not a failure.
@@ -261,7 +272,7 @@ class StudioHandler(SimpleHTTPRequestHandler):
                     self._json(500, {"error": f"copy failed: {exc}"})
                     return
 
-        self._json(200, {"flashed": FIRMWARE_NAME, "volume": str(volume)})
+        self._json(200, {"flashed": firmware_name, "half": half, "volume": str(volume)})
 
 
 def main():

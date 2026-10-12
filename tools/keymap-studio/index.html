@@ -63,9 +63,11 @@
         <div class="card-head">
           <h2>Combos</h2>
           <span id="combo-note" class="note">
-            Combos live in <code>config/eyelash_corne.keymap</code> &mdash; rebuild and flash to apply.
+            Combos are read from <code>config/eyelash_corne.keymap</code>. The keyboard keeps old combos until
+            <strong>both halves</strong> are flashed with a new build.
           </span>
           <span class="spacer"></span>
+          <button id="combo-reload" type="button">Reload from file</button>
           <button id="combo-new">New combo</button>
         </div>
         <div id="combo-list" class="combo-list"><span class="empty">Loading&hellip;</span></div>
@@ -100,13 +102,25 @@
               <div class="step-detail" id="step-build-detail">Waiting for a pushed commit.</div>
             </div>
           </li>
-          <li data-step="flash">
+          <li data-step="flash-left">
             <span class="dot"></span>
             <div>
               <strong>Flash the left half</strong>
-              <div class="step-detail" id="step-flash-detail">Double-tap reset on the left half to mount the bootloader drive.</div>
+              <div class="step-detail" id="step-flash-left-detail">Double-tap reset on the left half (studio firmware).</div>
               <div class="step-actions">
-                <button id="do-flash" disabled>Flash firmware</button>
+                <button id="do-flash-left" disabled>Flash left</button>
+              </div>
+            </div>
+          </li>
+          <li data-step="flash-right">
+            <span class="dot"></span>
+            <div>
+              <strong>Flash the right half</strong>
+              <div class="step-detail" id="step-flash-right-detail">
+                Combos on N/M/, etc. live on the right — flash this half too or old combos may still work.
+              </div>
+              <div class="step-actions">
+                <button id="do-flash-right" disabled>Flash right</button>
               </div>
             </div>
           </li>

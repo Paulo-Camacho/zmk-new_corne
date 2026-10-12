@@ -1,5 +1,6 @@
 import { StudioClient } from "./client.js";
 import { parseCombos, writeCombos, comboAppliesToLayer } from "./combos.js";
+import { positionLabel } from "./labels.js";
 import { BINDING_GROUPS, scanLocalBehaviors, scanUsedBindings } from "./bindings.js";
 import { core, behaviors as behaviorReq, keymap as keymapReq } from "./messages.js";
 import {
@@ -747,13 +748,16 @@ async function loadCombos() {
     state.combos = parseCombos(data.text);
     state.usedBindings = scanUsedBindings(data.text);
     state.localBehaviors = scanLocalBehaviors(data.text);
+    log(`loaded ${state.combos.length} combo(s) from ${state.keymapPath}`, "ok");
   } catch (err) {
     state.keymapText = null;
     state.combos = [];
     log(`could not read keymap for combos: ${err.message}`, "error");
   }
   renderCombos();
+  renderComboEditor();
   renderBindingSheet();
+  renderKeyboard();
 }
 
 async function saveCombos() {
@@ -777,13 +781,9 @@ async function saveCombos() {
   return true;
 }
 
-// The glyph on a key position, for showing what a combo is pressed with.
+// Keycap label for combo chips (always BASE layout — combos are defined in devicetree).
 function positionGlyph(position) {
-  const layer = state.keymap?.layers[state.layerIndex];
-  const binding = layer?.bindings[position];
-  if (!binding) return `#${position}`;
-  const label = bindingLabel(binding);
-  return label.main === "\u2014" ? `#${position}` : label.main;
+  return positionLabel(position);
 }
 
 function renderCombos() {
@@ -819,7 +819,7 @@ function renderCombos() {
       const chip = document.createElement("span");
       chip.className = "chip";
       chip.textContent = positionGlyph(position);
-      chip.title = `position ${position}`;
+      chip.title = `position ${position} (${positionLabel(position)})`;
       keys.append(chip);
     });
     row.append(keys);
@@ -862,6 +862,28 @@ function renderCombos() {
       renderKeyboard();
     });
     row.append(edit);
+
+    const remove = document.createElement("button");
+    remove.className = "danger combo-edit";
+    remove.textContent = "Delete";
+    remove.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      if (!confirm(`Delete combo "${combo.name}"?\n\nYou must commit, build, and flash both halves before it stops on the keyboard.`)) {
+        return;
+      }
+      const previous = state.combos;
+      state.combos = state.combos.filter((_, i) => i !== index);
+      if (await saveCombos()) {
+        state.comboDraft = null;
+        state.comboSelected = null;
+      } else {
+        state.combos = previous;
+      }
+      renderCombos();
+      renderComboEditor();
+      renderKeyboard();
+    });
+    row.append(remove);
 
     host.append(row);
   });
@@ -1258,6 +1280,8 @@ const apply = {
   buildTimer: null,
   bootloaderTimer: null,
   startedAt: 0,
+  flashLeftDone: false,
+  flashRightDone: false,
 };
 
 // GitHub's own status strings are not written for people to read.
@@ -1350,9 +1374,12 @@ async function pollBuild() {
       const took = Math.round((Date.now() - apply.startedAt) / 1000);
       setStep("build", "done", `Build succeeded in ${took}s.`);
       setStepLink("build", build.url, `run ${build.runId}`);
-      setStep("flash", "active");
+      apply.flashLeftDone = false;
+      apply.flashRightDone = false;
+      setStep("flash-left", "active");
+      setStep("flash-right", "", "Flash after the left half, or plug in the right half first if you only need combo keys on that side.");
       watchBootloader();
-      log("firmware built — double-tap reset on the left half to flash", "ok");
+      log("firmware built — flash left, then right (USB + double-tap reset each half)", "ok");
     } else {
       setStep("build", "failed", `Build ${build.conclusion}.`);
       setStepLink("build", build.url, "open the failed run");
@@ -1372,11 +1399,47 @@ function watchBootloader() {
   apply.bootloaderTimer = setInterval(async () => {
     const repo = await api("/api/repo").catch(() => null);
     const mounted = Boolean(repo?.bootloader);
-    $("do-flash").disabled = !mounted || !apply.runId;
-    $("step-flash-detail").textContent = mounted
-      ? `Bootloader drive mounted at ${repo.bootloader} — ready to flash.`
-      : "Double-tap reset on the left half to mount the bootloader drive.";
+    const ready = mounted && apply.runId;
+    $("do-flash-left").disabled = !ready || apply.flashLeftDone;
+    $("do-flash-right").disabled = !ready;
+    const mountMsg = mounted
+      ? `Bootloader at ${repo.bootloader} — choose Flash left or Flash right for whichever half is plugged in.`
+      : "Plug in one half over USB, double-tap reset, then flash.";
+    if (!apply.flashLeftDone) {
+      $("step-flash-left-detail").textContent = mountMsg;
+    }
+    $("step-flash-right-detail").textContent = apply.flashRightDone
+      ? "Right half flashed for this build."
+      : `${mountMsg} Combos on N/M/, etc. require flashing the right half.`;
   }, 2000);
+}
+
+async function flashFirmwareHalf(half) {
+  const step = half === "left" ? "flash-left" : "flash-right";
+  const button = $(`do-flash-${half}`);
+  button.disabled = true;
+  setStep(step, "active", `Downloading firmware and copying to the ${half} half…`);
+  try {
+    const result = await api("/api/flash", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ runId: apply.runId, half }),
+    });
+    setStep(step, "done", `Flashed ${result.flashed}.`);
+    log(`flashed ${half} half (${result.flashed})`, "ok");
+    if (half === "left") {
+      apply.flashLeftDone = true;
+      setStep("flash-right", apply.flashRightDone ? "done" : "active");
+    } else {
+      apply.flashRightDone = true;
+      await loadCombos();
+      log("combo list matches keymap file — keyboard should match after both halves are flashed", "ok");
+    }
+  } catch (err) {
+    setStep(step, "failed", err.message);
+    log(err.message, "error");
+    button.disabled = false;
+  }
 }
 
 $("do-commit").addEventListener("click", () => guarded(async () => {
@@ -1406,25 +1469,12 @@ $("do-commit").addEventListener("click", () => guarded(async () => {
   refreshRepoState();
 }));
 
-$("do-flash").addEventListener("click", () => guarded(async () => {
-  const button = $("do-flash");
-  button.disabled = true;
-  setStep("flash", "active", "Downloading firmware and copying to the bootloader drive…");
-  try {
-    const result = await api("/api/flash", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ runId: apply.runId }),
-    });
-    setStep("flash", "done", `Flashed ${result.flashed}. The keyboard reboots on its own.`);
-    log(`flashed ${result.flashed} — combos are live after it reboots`, "ok");
-    clearInterval(apply.bootloaderTimer);
-    apply.bootloaderTimer = null;
-  } catch (err) {
-    setStep("flash", "failed", err.message);
-    log(err.message, "error");
-    button.disabled = false;
-  }
+$("do-flash-left").addEventListener("click", () => guarded(() => flashFirmwareHalf("left")));
+$("do-flash-right").addEventListener("click", () => guarded(() => flashFirmwareHalf("right")));
+
+$("combo-reload").addEventListener("click", () => guarded(async () => {
+  await loadCombos();
+  log("reloaded combos from disk", "ok");
 }));
 
 // --- wiring ---------------------------------------------------------------
