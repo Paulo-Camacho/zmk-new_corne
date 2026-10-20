@@ -52,6 +52,22 @@ If the port is already taken, free it or use another:
 lsof -ti tcp:8181 | xargs kill        # stop a server left running
 ```
 
+### Linux
+
+The keyboard shows up as `/dev/ttyACM0` (or `ttyACM1`), owned by the `uucp` group
+on Arch-based distros (`dialout` on Debian/Ubuntu). The browser can't open it until
+your user is in that group:
+
+```bash
+sudo usermod -aG uucp "$USER"      # Debian/Ubuntu: dialout instead of uucp
+# then log out and back in (or reboot) so the new group applies
+```
+
+For the flash steps, the bootloader drive (`NICENANO`) has to be mounted. An
+automounter such as udiskie or a desktop file manager mounts it under
+`/run/media/$USER/` or `/media/$USER/`, which the server checks. Without one,
+mount it yourself: `udisksctl mount -b /dev/sdX` (`lsblk` shows which device).
+
 > `file:///…/index.html` will **not** work: WebSerial needs a secure context, and
 > a `file://` page is not one. It has to be served over `http://localhost`.
 

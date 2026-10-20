@@ -11,7 +11,9 @@ rebuilding and flashing. Exactly one file is reachable, and the socket is bound
 to the loopback interface.
 """
 
+import getpass
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -47,16 +49,48 @@ def run(args, timeout=120):
     return done.returncode == 0, done.stdout.strip(), done.stderr.strip()
 
 
+def mount_roots():
+    """Directories whose children are removable-drive mount points.
+
+    macOS mounts under /Volumes; Linux automounters (udisks2, udiskie, GNOME)
+    use /run/media/$USER or /media/$USER, and some distros plain /media.
+    """
+    user = getpass.getuser()
+    return [
+        Path("/Volumes"),
+        Path("/run/media") / user,
+        Path("/media") / user,
+        Path("/media"),
+    ]
+
+
 def bootloader_volume():
     """The mounted bootloader drive, if the keyboard is waiting for firmware."""
-    volumes = Path("/Volumes")
-    if not volumes.is_dir():
-        return None
-    for entry in volumes.iterdir():
-        name = entry.name.upper().replace(" ", "")
-        if any(hint in name for hint in BOOTLOADER_HINTS):
-            return entry
+    for root in mount_roots():
+        if not root.is_dir():
+            continue
+        try:
+            entries = list(root.iterdir())
+        except OSError:
+            continue
+        for entry in entries:
+            name = entry.name.upper().replace(" ", "")
+            if any(hint in name for hint in BOOTLOADER_HINTS) and entry.is_dir():
+                return entry
     return None
+
+
+def write_uf2(source, dest):
+    """Copy a UF2 and force it to the device before returning.
+
+    Linux buffers writes to removable drives, so without the fsync the request
+    can report success while the firmware still sits in the page cache. Only
+    the data is copied: FAT has no permission bits for copy2 to set.
+    """
+    with open(source, "rb") as src, open(dest, "wb") as out:
+        shutil.copyfileobj(src, out)
+        out.flush()
+        os.fsync(out.fileno())
 
 
 class StudioHandler(SimpleHTTPRequestHandler):
@@ -272,7 +306,7 @@ class StudioHandler(SimpleHTTPRequestHandler):
                 return
 
             try:
-                shutil.copy2(firmware, volume / firmware_name)
+                write_uf2(firmware, volume / firmware_name)
             except OSError as exc:
                 # The board reboots the moment the write completes, so an
                 # error on close is normal and not a failure.
