@@ -1,5 +1,9 @@
 # Eyelash Peripherals Corne ZMK Repository
 
+# run
+```
+ tools/keymap-studio/serve.sh 9000
+```
 **This keyboard is not the same as [foostan's Corne](https://github.com/foostan/crkbd). It will not work with standard `corne` firmware.**
 
 ![Photo of Eyelash Peripherals Corne](https://ae01.alicdn.com/kf/Sa797fee25edd44248fbfdb0e13d44e00B.jpg)
