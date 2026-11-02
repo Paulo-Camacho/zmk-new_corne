@@ -172,6 +172,29 @@ drops only keymap overrides in flash. It is **not** a substitute for flashing
 
 Needs `git` and an authenticated `gh` CLI.
 
+## Flashing a firmware change already pushed to GitHub
+
+The **Build and flash firmware** panel can also use the CI build of the current
+commit without making another keymap commit. This is the path for changes such as
+the left-half battery reporting settings:
+
+1. Start the local app with `tools/keymap-studio/serve.sh` and open
+   `http://localhost:8181/` in a browser.
+2. Click **Use current commit's build**. The app selects the GitHub Actions run
+   for that exact pushed commit and waits for a successful build.
+3. Connect the **left** half over USB and double-tap its reset button. When the
+   `NICENANO` bootloader drive appears, click **Flash left** and confirm that the
+   connected half is the left one. The app downloads and copies only
+   `eyelash_corne_studio_left.uf2`. No settings reset or right-half flash is
+   needed for the battery reporting change.
+
+The app needs one-time GitHub CLI authentication (`gh auth login -h github.com`)
+to read Actions artifacts. It will show an authentication error if that login is
+missing or expired. It cannot press the keyboard's physical reset button or tell
+left and right bootloader drives apart, so confirm the connected half before
+flashing. macOS may still require a separate battery viewer to display both
+reported levels.
+
 ## Layout
 
 | File | Role |

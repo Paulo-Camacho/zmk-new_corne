@@ -33,7 +33,7 @@ FIRMWARE_RIGHT = "eyelash_corne_right nice_view-nice_nano_v2-zmk.uf2"
 FIRMWARE_SETTINGS_RESET = "settings_reset-nice_nano_v2-zmk.uf2"
 WORKFLOW_NAME = "Build ZMK firmware (vendored)"
 # nice_nano_v2 in bootloader mode mounts as a mass-storage volume.
-BOOTLOADER_HINTS = ("NICENANO", "NICE_NANO", "CIRCUITPY", "RPI-RP2")
+BOOTLOADER_HINTS = ("NICENANO", "NICE_NANO")
 
 
 def run(args, timeout=120):
@@ -75,7 +75,7 @@ def bootloader_volume():
             continue
         for entry in entries:
             name = entry.name.upper().replace(" ", "")
-            if any(hint in name for hint in BOOTLOADER_HINTS) and entry.is_dir():
+            if name in BOOTLOADER_HINTS and entry.is_dir() and (entry / "INFO_UF2.TXT").is_file():
                 return entry
     return None
 
@@ -185,11 +185,13 @@ class StudioHandler(SimpleHTTPRequestHandler):
             return
         _, head, _ = run(["git", "rev-parse", "HEAD"])
         _, changed, _ = run(["git", "status", "--porcelain", "--", str(KEYMAP)])
+        _, worktree_changed, _ = run(["git", "status", "--porcelain"])
         _, unpushed, _ = run(["git", "rev-list", "--count", f"origin/{branch}..HEAD"])
         self._json(200, {
             "branch": branch,
             "head": head,
             "keymapDirty": bool(changed),
+            "worktreeDirty": bool(worktree_changed),
             "unpushed": int(unpushed) if unpushed.isdigit() else 0,
             "bootloader": str(bootloader_volume() or ""),
         })
@@ -237,11 +239,15 @@ class StudioHandler(SimpleHTTPRequestHandler):
             return
 
         ok, out, err = run([
-            "gh", "run", "list", "--limit", "30", "--json",
+            "gh", "run", "list", "--workflow", "build.yml", "--commit", sha,
+            "--limit", "10", "--json",
             "databaseId,headSha,status,conclusion,workflowName,url,createdAt",
         ])
         if not ok:
-            self._json(500, {"error": f"gh run list failed: {err}"})
+            self._json(500, {
+                "error": f"Cannot read GitHub Actions: {err}",
+                "hint": "Sign in once with gh auth login -h github.com, then try again",
+            })
             return
 
         runs = [
@@ -263,16 +269,34 @@ class StudioHandler(SimpleHTTPRequestHandler):
     def api_flash(self):
         payload = self._body()
         run_id = payload.get("runId")
+        expected_sha = payload.get("sha")
         half = (payload.get("half") or "left").lower()
         kind = (payload.get("kind") or "firmware").lower()
-        if not run_id:
-            self._json(400, {"error": "missing runId"})
+        if not isinstance(run_id, int) or not isinstance(expected_sha, str) or len(expected_sha) != 40:
+            self._json(400, {"error": "expected a runId and full commit sha"})
             return
         if half not in ("left", "right"):
             self._json(400, {"error": 'half must be "left" or "right"'})
             return
         if kind not in ("firmware", "settings_reset"):
             self._json(400, {"error": 'kind must be "firmware" or "settings_reset"'})
+            return
+
+        ok, out, err = run([
+            "gh", "run", "view", str(run_id), "--json",
+            "headSha,status,conclusion,workflowName",
+        ])
+        if not ok:
+            self._json(500, {"error": f"Cannot verify build: {err or out}"})
+            return
+        try:
+            build = json.loads(out)
+        except ValueError:
+            self._json(500, {"error": "GitHub returned invalid build data"})
+            return
+        if (build.get("headSha") != expected_sha or build.get("workflowName") != WORKFLOW_NAME
+                or build.get("status") != "completed" or build.get("conclusion") != "success"):
+            self._json(409, {"error": "build is not a successful build of the selected commit"})
             return
 
         if kind == "settings_reset":
@@ -308,11 +332,11 @@ class StudioHandler(SimpleHTTPRequestHandler):
             try:
                 write_uf2(firmware, volume / firmware_name)
             except OSError as exc:
-                # The board reboots the moment the write completes, so an
-                # error on close is normal and not a failure.
-                if "Input/output error" not in str(exc) and "No such file" not in str(exc):
-                    self._json(500, {"error": f"copy failed: {exc}"})
-                    return
+                self._json(500, {
+                    "error": f"copy was interrupted: {exc}",
+                    "hint": "Check whether the keyboard rebooted with the new firmware before retrying",
+                })
+                return
 
         self._json(200, {"flashed": firmware_name, "half": half, "volume": str(volume)})
 

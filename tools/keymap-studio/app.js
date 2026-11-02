@@ -1327,6 +1327,7 @@ window.addEventListener("keyup", (event) => {
 
 const apply = {
   sha: null,
+  mode: null,
   runId: null,
   buildTimer: null,
   bootloaderTimer: null,
@@ -1387,9 +1388,11 @@ async function refreshRepoState() {
     const repo = await api("/api/repo");
     const bits = [`branch ${repo.branch}`];
     if (repo.keymapDirty) bits.push("keymap has uncommitted changes");
+    if (repo.worktreeDirty) bits.push("uncommitted files are excluded from the current build");
     if (repo.unpushed) bits.push(`${repo.unpushed} unpushed`);
     $("repo-state").textContent = bits.join(" · ");
     $("do-commit").disabled = !repo.keymapDirty;
+    $("do-use-current").disabled = !repo.head || repo.unpushed > 0;
     // A finished push stays reported as done; only an idle step tracks the file.
     if (!apply.sha) {
       setStep("commit", repo.keymapDirty ? "active" : "", repo.keymapDirty
@@ -1433,12 +1436,24 @@ async function pollBuild() {
       apply.settingsResetLeftDone = false;
       apply.settingsResetRightDone = false;
       apply.settingsResetSkipped = false;
-      setStep("reset-left", "active");
-      setStep("reset-right", "", "After the left half, reset the right half the same way.");
-      setStep("flash-left", "", "Available after settings reset on both halves.");
-      setStep("flash-right", "", "Flash after the studio left firmware.");
+      if (apply.mode === "firmware") {
+        apply.settingsResetSkipped = true;
+        $("do-skip-reset").disabled = true;
+        setStep("reset-left", "done", "Skipped — saved settings are preserved.");
+        setStep("reset-right", "done", "Skipped.");
+        setStep("flash-left", "active", "Plug in the left half and double-tap reset.");
+        setStep("flash-right", "", "Optional — flash only if this update changes the right half.");
+      } else {
+        $("do-skip-reset").disabled = false;
+        setStep("reset-left", "active");
+        setStep("reset-right", "", "After the left half, reset the right half the same way.");
+        setStep("flash-left", "", "Available after settings reset on both halves.");
+        setStep("flash-right", "", "Flash after the studio left firmware.");
+      }
       watchBootloader();
-      log("firmware built — settings reset both halves, then flash left and right", "ok");
+      log(apply.mode === "firmware"
+        ? "firmware built — flash the affected half (left for battery reporting)"
+        : "firmware built — settings reset both halves, then flash left and right", "ok");
     } else {
       setStep("build", "failed", `Build ${build.conclusion}.`);
       setStepLink("build", build.url, "open the failed run");
@@ -1461,17 +1476,17 @@ function watchBootloader() {
     const ready = mounted && apply.runId;
     const resetsDone = apply.settingsResetSkipped
       || (apply.settingsResetLeftDone && apply.settingsResetRightDone);
-    $("do-reset-left").disabled = !ready || apply.settingsResetLeftDone;
-    $("do-reset-right").disabled = !ready || apply.settingsResetRightDone;
+    $("do-reset-left").disabled = apply.mode === "firmware" || !ready || apply.settingsResetLeftDone;
+    $("do-reset-right").disabled = apply.mode === "firmware" || !ready || apply.settingsResetRightDone;
     $("do-flash-left").disabled = !ready || !resetsDone || apply.flashLeftDone;
-    $("do-flash-right").disabled = !ready || !resetsDone;
+    $("do-flash-right").disabled = !ready || !resetsDone || apply.flashRightDone;
     const mountMsg = mounted
       ? `Bootloader at ${repo.bootloader} — flash the step for whichever half is plugged in.`
       : "Plug in one half over USB, double-tap reset, then flash.";
-    if (!apply.settingsResetLeftDone) {
+    if (apply.mode !== "firmware" && !apply.settingsResetLeftDone) {
       $("step-reset-left-detail").textContent = mountMsg;
     }
-    if (!apply.settingsResetRightDone) {
+    if (apply.mode !== "firmware" && !apply.settingsResetRightDone) {
       $("step-reset-right-detail").textContent = apply.settingsResetRightDone
         ? "Right half settings cleared."
         : mountMsg;
@@ -1481,7 +1496,9 @@ function watchBootloader() {
         ? mountMsg
         : "Finish settings reset on both halves first.";
     }
-    $("step-flash-right-detail").textContent = apply.flashRightDone
+    $("step-flash-right-detail").textContent = apply.mode === "firmware"
+      ? apply.flashRightDone ? "Right half flashed for this build." : `Optional if the right half changed. ${mountMsg}`
+      : apply.flashRightDone
       ? "Right half flashed for this build."
       : resetsDone
         ? `${mountMsg} Combos on N/M/, etc. require flashing the right half.`
@@ -1490,7 +1507,7 @@ function watchBootloader() {
 }
 
 function skipSettingsReset() {
-  if (!apply.runId) return;
+  if (!apply.runId || apply.mode === "firmware") return;
   if (!confirm(
     "Skip settings reset and keep Studio-saved keybinds in flash?\n\n"
     + "Combos still update when you flash left and right — they come from the "
@@ -1514,7 +1531,7 @@ async function flashSettingsResetHalf(half) {
     const result = await api("/api/flash", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ runId: apply.runId, half, kind: "settings_reset" }),
+      body: JSON.stringify({ runId: apply.runId, sha: apply.sha, half, kind: "settings_reset" }),
     });
     setStep(step, "done", `Flashed ${result.flashed} — settings cleared on boot.`);
     log(`settings reset on ${half} half (${result.flashed})`, "ok");
@@ -1559,6 +1576,7 @@ async function resetSavedKeymapRpc() {
 }
 
 async function flashFirmwareHalf(half) {
+  if (!confirm(`Is the ${half} half connected and showing its NICENANO bootloader drive?\n\nThe app cannot tell the halves apart from the drive name.`)) return;
   const step = half === "left" ? "flash-left" : "flash-right";
   const button = $(`do-flash-${half}`);
   button.disabled = true;
@@ -1567,23 +1585,42 @@ async function flashFirmwareHalf(half) {
     const result = await api("/api/flash", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ runId: apply.runId, half }),
+      body: JSON.stringify({ runId: apply.runId, sha: apply.sha, half }),
     });
     setStep(step, "done", `Flashed ${result.flashed}.`);
     log(`flashed ${half} half (${result.flashed})`, "ok");
     if (half === "left") {
       apply.flashLeftDone = true;
-      setStep("flash-right", apply.flashRightDone ? "done" : "active");
+      if (apply.mode === "firmware") {
+        log("left firmware flashed — reconnect the keyboard to check it", "ok");
+      } else {
+        setStep("flash-right", apply.flashRightDone ? "done" : "active");
+      }
     } else {
       apply.flashRightDone = true;
-      await loadCombos();
-      log("combo list matches keymap file — keyboard should match after both halves are flashed", "ok");
+      if (apply.mode === "combo") {
+        await loadCombos();
+        log("combo list matches keymap file — keyboard should match after both halves are flashed", "ok");
+      } else {
+        log("right firmware flashed", "ok");
+      }
     }
   } catch (err) {
     setStep(step, "failed", err.message);
     log(err.message, "error");
     button.disabled = false;
   }
+}
+
+function startBuild(sha, mode) {
+  apply.sha = sha;
+  apply.mode = mode;
+  apply.runId = null;
+  apply.startedAt = Date.now();
+  setStep("build", "active", "Looking for the GitHub Actions build…");
+  clearInterval(apply.buildTimer);
+  apply.buildTimer = setInterval(pollBuild, 10000);
+  pollBuild();
 }
 
 $("do-commit").addEventListener("click", () => guarded(async () => {
@@ -1596,21 +1633,25 @@ $("do-commit").addEventListener("click", () => guarded(async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: $("commit-message").value.trim() }),
     });
-    apply.sha = result.sha;
-    apply.startedAt = Date.now();
     setStep("commit", "done", `Pushed ${result.sha.slice(0, 7)} to ${result.branch}.`);
-    setStep("build", "active", "Waiting for GitHub Actions…");
     log(`pushed ${result.sha.slice(0, 7)} to ${result.branch}`, "ok");
-
-    clearInterval(apply.buildTimer);
-    apply.buildTimer = setInterval(pollBuild, 10000);
-    pollBuild();
+    startBuild(result.sha, "combo");
   } catch (err) {
     setStep("commit", "failed", err.message);
     log(err.message, "error");
     button.disabled = false;
   }
   refreshRepoState();
+}));
+
+$("do-use-current").addEventListener("click", () => guarded(async () => {
+  const repo = await api("/api/repo");
+  if (repo.unpushed) {
+    throw new Error("Push the current commit before using its build.");
+  }
+  setStep("commit", "done", `Using pushed commit ${repo.head.slice(0, 7)} on ${repo.branch}.`);
+  log(`using firmware build for ${repo.head.slice(0, 7)}`, "ok");
+  startBuild(repo.head, "firmware");
 }));
 
 $("do-skip-reset").addEventListener("click", () => skipSettingsReset());
