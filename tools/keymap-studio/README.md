@@ -20,18 +20,16 @@ consistent with the vendoring policy in [VENDOR.md](../../VENDOR.md).
 From the repository root:
 
 ```bash
-# start the app (serves http://localhost:8181/)
+# start the app and open your default browser (http://localhost:8181/)
 tools/keymap-studio/serve.sh
 
 # or pick a different port
 tools/keymap-studio/serve.sh 9000
 
-# open it
-open http://localhost:8181/            # macOS
-xdg-open http://localhost:8181/        # Linux
 ```
 
-Leave that terminal running — it is the server. `Ctrl-C` stops it.
+Leave that terminal running — it is the server. `Ctrl-C` stops it. To serve the
+page without opening a browser, run `python3 tools/keymap-studio/serve.py`.
 
 Equivalent invocations, if you prefer:
 

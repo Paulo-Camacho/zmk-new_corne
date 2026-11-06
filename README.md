@@ -31,7 +31,7 @@ See [VENDOR.md](VENDOR.md) for archived sources, pinned commits, and local build
 and edit bindings, layers and combos in real time.
 
 ```bash
-tools/keymap-studio/serve.sh          # then open http://localhost:8181/
+tools/keymap-studio/serve.sh          # opens http://localhost:8181/ in your default browser
 ```
 
 Needs Python 3 and a Chromium-based browser (WebSerial). Stop it with `Ctrl-C`.

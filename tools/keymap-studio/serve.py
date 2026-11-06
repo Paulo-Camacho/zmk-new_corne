@@ -11,6 +11,7 @@ rebuilding and flashing. Exactly one file is reachable, and the socket is bound
 to the loopback interface.
 """
 
+import argparse
 import getpass
 import json
 import os
@@ -18,6 +19,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import webbrowser
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -342,15 +345,25 @@ class StudioHandler(SimpleHTTPRequestHandler):
 
 
 def main():
-    port = int(sys.argv[1]) if len(sys.argv) > 1 else 8181
+    parser = argparse.ArgumentParser(description="Run Corne Keymap Studio")
+    parser.add_argument("port", nargs="?", type=int, default=8181)
+    parser.add_argument("--open", action="store_true", dest="open_browser")
+    args = parser.parse_args()
+    port = args.port
     handler = partial(StudioHandler, directory=str(HERE))
     server = ThreadingHTTPServer(("127.0.0.1", port), handler)
-    print(f"Corne Keymap Studio: http://localhost:{port}/")
+    url = f"http://localhost:{port}/"
+    print(f"Corne Keymap Studio: {url}")
     print(f"combos file: {KEYMAP}")
+    if args.open_browser:
+        # The server binds above; launch after serve_forever begins accepting.
+        threading.Timer(0.5, webbrowser.open, args=(url,)).start()
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         pass
+    finally:
+        server.server_close()
 
 
 if __name__ == "__main__":
